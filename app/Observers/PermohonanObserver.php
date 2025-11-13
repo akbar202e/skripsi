@@ -10,6 +10,11 @@ class PermohonanObserver
     {
         $permohonan->user_id = auth()->id();
     }
+    public function updating(Permohonan $permohonan): void
+    {
+        // $permohonan->worker_id = auth()->id();
+        // $permohonan->status = 'menunggu verifikasi';
+    }
     /**
      * Handle the Permohonan "created" event.
      */

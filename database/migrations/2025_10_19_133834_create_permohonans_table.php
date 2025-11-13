@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('judul', 100);
             $table->text('isi');
-            $table->string('status')->default('menunggu verifikasi'); //terverifikasi, selesai, dibatalkan
+            $table->string('status')->default('menunggu verifikasi'); //diproses, terverifikasi, selesai, dibatalkan, perlu perbaikan
             $table->foreignID('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignID('worker_id')->nullable()->constrained('users')->onDelete('set null');
             $table->text('keterangan')->nullable();
