@@ -24,18 +24,22 @@ public function getTabs(): array
 {
     return [
         'all' => Tab::make(),
-        'menunggu verifikasi' => Tab::make()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'menunggu verifikasi')),
-        'terverifikasi' => Tab::make()
+        'Menunggu Verifikasi' => Tab::make()
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'permohonan_masuk')),
+        'Proses Verifikasi' => Tab::make()
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'verifikasi_berkas')),
+        'Perlu Perbaikan' => Tab::make()
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'perlu_perbaikan')),
+        'Terverifikasi' => Tab::make()
             ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'terverifikasi')),
-        'diproses' => Tab::make()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'diproses')),
-        'selesai' => Tab::make()
+        'Menunggu Sampel' => Tab::make()
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'menunggu_sampel_dan_pembayaran')),
+        'Proses Administrasi' => Tab::make()
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'proses_administrasi')),
+        'Proses Pengujian' => Tab::make()
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'pengujian')),
+        'Selesai' => Tab::make()
             ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'selesai')),
-        'dibatalkan' => Tab::make()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'dibatalkan')),
-        'perlu perbaikan' => Tab::make()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'perlu perbaikan')),
     ];
 }
 }

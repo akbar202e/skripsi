@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Policies\RolePolicy;
 use App\Policies\PermissionPolicy;
+use App\Policies\DokumenPolicy;
+use App\Models\Dokumen;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
@@ -28,5 +30,6 @@ class AppServiceProvider extends ServiceProvider
         Model::unguard();
         Gate::policy(Permission::class, PermissionPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(Dokumen::class, DokumenPolicy::class);
     }
 }

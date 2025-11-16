@@ -20,6 +20,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
+use SolutionForest\FilamentPanzoom\FilamentPanzoomPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -31,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login(LoginCustom::class)
             ->registration(RegisterCustom::class)
+            ->brandName('UPT LAB.')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -58,6 +60,7 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-                ->plugin(FilamentSpatieRolesPermissionsPlugin::make());
+                ->plugin(FilamentSpatieRolesPermissionsPlugin::make())
+                ->plugin(FilamentPanzoomPlugin::make());
     }
 }

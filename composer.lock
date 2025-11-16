@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9af575bc9105d25e16ef68c8a9d0ee4d",
+    "content-hash": "55692ae31730f6b9326dd66349f59606",
     "packages": [
         {
             "name": "althinect/filament-spatie-roles-permissions",
@@ -4762,6 +4762,84 @@
                 }
             ],
             "time": "2025-02-25T09:09:36+00:00"
+        },
+        {
+            "name": "solution-forest/filament-panzoom",
+            "version": "v1.4.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/solutionforest/filament-panzoom.git",
+                "reference": "23aeb262fff5ed9ccee76773ff0c3d25b292ae7c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/solutionforest/filament-panzoom/zipball/23aeb262fff5ed9ccee76773ff0c3d25b292ae7c",
+                "reference": "23aeb262fff5ed9ccee76773ff0c3d25b292ae7c",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^3.3|^4.0",
+                "php": "^8.3",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.9",
+                "nunomaduro/larastan": "^2.0.1",
+                "orchestra/testbench": "^8.0",
+                "pestphp/pest": "^2.1",
+                "pestphp/pest-plugin-arch": "^2.0",
+                "pestphp/pest-plugin-laravel": "^2.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "FilamentPanzoom": "SolutionForest\\FilamentPanzoom\\Facades\\FilamentPanzoom"
+                    },
+                    "providers": [
+                        "SolutionForest\\FilamentPanzoom\\FilamentPanzoomServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SolutionForest\\FilamentPanzoom\\": "src/",
+                    "SolutionForest\\FilamentPanzoom\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jacky",
+                    "email": "info+package@solutionforest.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This is my package filament-panzoom",
+            "homepage": "https://github.com/solutionforest/filament-panzoom",
+            "keywords": [
+                "filament-panzoom",
+                "laravel",
+                "solutionforest"
+            ],
+            "support": {
+                "issues": "https://github.com/solutionforest/filament-panzoom/issues",
+                "source": "https://github.com/solutionforest/filament-panzoom"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/SolutionForest",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-09-03T05:43:51+00:00"
         },
         {
             "name": "spatie/color",

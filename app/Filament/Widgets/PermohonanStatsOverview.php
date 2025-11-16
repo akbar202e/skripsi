@@ -14,16 +14,10 @@ class PermohonanStatsOverview extends BaseWidget
             Stat::make('Menunggu Verifikasi', Permohonan::where('status', 'permohonan_masuk')->when(auth()->user()->hasRole('Pemohon'), function($query){
                 $query->where('user_id', auth()->user()->id);
             })->count()),
-            Stat::make('Proses Verifikasi', Permohonan::where('status', 'verifikasi_berkas')->when(auth()->user()->hasRole('Pemohon'), function($query){
-                $query->where('user_id', auth()->user()->id);
-            })->count()),
             Stat::make('Perlu Perbaikan', Permohonan::where('status', 'perlu_perbaikan')->when(auth()->user()->hasRole('Pemohon'), function($query){
                 $query->where('user_id', auth()->user()->id);
             })->count()),
-            Stat::make('Terverifikasi', Permohonan::where('status', 'terverifikasi')->when(auth()->user()->hasRole('Pemohon'), function($query){
-                $query->where('user_id', auth()->user()->id);
-            })->count()),
-            Stat::make('Menunggu Sampel', Permohonan::where('status', 'menunggu_sampel_dan_pembayaran')->when(auth()->user()->hasRole('Pemohon'), function($query){
+            Stat::make('Menunggu Sampel', Permohonan::where('status', 'terverifikasi')->when(auth()->user()->hasRole('Pemohon'), function($query){
                 $query->where('user_id', auth()->user()->id);
             })->count()),
             Stat::make('Proses Administrasi', Permohonan::where('status', 'proses_administrasi')->when(auth()->user()->hasRole('Pemohon'), function($query){

@@ -36,6 +36,8 @@ class PermohonanResource extends Resource
                 Forms\Components\FileUpload::make('surat_permohonan')
                     ->label('Upload Surat Permohonan (PDF)')
                     ->acceptedFileTypes(['application/pdf'])
+                    ->directory('permohonan')
+                    ->disk('public')
                     ->downloadable()
                     ->openable()
                     ->columnSpanFull(),
@@ -57,6 +59,8 @@ class PermohonanResource extends Resource
                 Forms\Components\FileUpload::make('laporan_hasil')
                     ->label('Upload Laporan Hasil (PDF)')
                     ->acceptedFileTypes(['application/pdf'])
+                    ->directory('permohonan')
+                    ->disk('public')
                     ->downloadable()
                     ->openable()
                     ->visible(fn (Get $get) => in_array($get('status'), ['selesai']))
@@ -195,6 +199,8 @@ class PermohonanResource extends Resource
                             Forms\Components\FileUpload::make('laporan_hasil')
                                 ->label('Upload Laporan Hasil (PDF)')
                                 ->acceptedFileTypes(['application/pdf'])
+                                ->directory('permohonan')
+                                ->disk('public')
                                 ->required(),
                         ])
                         ->action(function (Permohonan $record, array $data) {
