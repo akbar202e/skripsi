@@ -80,4 +80,8 @@ class PermohonanDailyChart extends ChartWidget
             'maintainAspectRatio' => true,
         ];
     }
+    public static function canView(): bool
+    {
+       return auth()->user()->hasRole('Admin');
+    }
 }

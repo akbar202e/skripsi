@@ -69,4 +69,8 @@ class PermohonanChart extends ChartWidget
             ],
         ];
     }
+    public static function canView(): bool
+    {
+       return auth()->user()->hasRole('Admin');
+    }
 }

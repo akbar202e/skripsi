@@ -11,19 +11,19 @@ class PermohonanStatsOverview extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Menunggu Verifikasi', Permohonan::where('status', 'permohonan_masuk')->when(auth()->user()->hasRole('Pemohon'), function($query){
+            Stat::make('Menunggu Verifikasi', Permohonan::where('status', 'menunggu_verifikasi')->when(auth()->user()->hasRole('Pemohon'), function($query){
                 $query->where('user_id', auth()->user()->id);
             })->count()),
             Stat::make('Perlu Perbaikan', Permohonan::where('status', 'perlu_perbaikan')->when(auth()->user()->hasRole('Pemohon'), function($query){
                 $query->where('user_id', auth()->user()->id);
             })->count()),
-            Stat::make('Menunggu Sampel', Permohonan::where('status', 'terverifikasi')->when(auth()->user()->hasRole('Pemohon'), function($query){
+            Stat::make('Menunggu Pembayaran & Sampel', Permohonan::where('status', 'menunggu_pembayaran_sampel')->when(auth()->user()->hasRole('Pemohon'), function($query){
                 $query->where('user_id', auth()->user()->id);
             })->count()),
-            Stat::make('Proses Administrasi', Permohonan::where('status', 'proses_administrasi')->when(auth()->user()->hasRole('Pemohon'), function($query){
+            Stat::make('Sedang Diuji', Permohonan::where('status', 'sedang_diuji')->when(auth()->user()->hasRole('Pemohon'), function($query){
                 $query->where('user_id', auth()->user()->id);
             })->count()),
-            Stat::make('Proses Pengujian', Permohonan::where('status', 'pengujian')->when(auth()->user()->hasRole('Pemohon'), function($query){
+            Stat::make('Menyusun Laporan', Permohonan::where('status', 'menyusun_laporan')->when(auth()->user()->hasRole('Pemohon'), function($query){
                 $query->where('user_id', auth()->user()->id);
             })->count()),
             Stat::make('Selesai', Permohonan::where('status', 'selesai')->when(auth()->user()->hasRole('Pemohon'), function($query){

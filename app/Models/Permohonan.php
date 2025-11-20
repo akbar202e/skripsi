@@ -46,6 +46,8 @@ class Permohonan extends Model
 
     public function jenisPengujians(): BelongsToMany
     {
-        return $this->belongsToMany(JenisPengujian::class, 'permohonan_pengujian');
+        return $this->belongsToMany(JenisPengujian::class, 'permohonan_pengujian')
+            ->withPivot('jumlah_sampel')
+            ->withTimestamps();
     }
 }

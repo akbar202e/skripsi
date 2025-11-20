@@ -25,52 +25,58 @@ class PermohonanResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('judul')
-                    ->required()
-                    ->maxLength(100)
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('isi')
-                    ->required()
-                    ->rows(10)
-                    ->columnSpanFull(),
-                Forms\Components\FileUpload::make('surat_permohonan')
-                    ->label('Upload Surat Permohonan (PDF)')
-                    ->acceptedFileTypes(['application/pdf'])
-                    ->directory('permohonan')
-                    ->disk('public')
-                    ->downloadable()
-                    ->openable()
-                    ->columnSpanFull(),
-                Forms\Components\Select::make('jenis_pengujian')
-                    ->relationship('jenisPengujians', 'nama_pengujian')
-                    ->multiple()
-                    ->required()
-                    ->preload()
-                    ->live()
-                    ->afterStateUpdated(function ($state, Set $set) {
-                        $total = \App\Models\JenisPengujian::whereIn('id', $state)->sum('biaya');
-                        $set('total_biaya', $total);
-                    })
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('total_biaya')
-                    ->label('Total Biaya')
-                    ->prefix('Rp')
-                    ->numeric(),
-                Forms\Components\FileUpload::make('laporan_hasil')
-                    ->label('Upload Laporan Hasil (PDF)')
-                    ->acceptedFileTypes(['application/pdf'])
-                    ->directory('permohonan')
-                    ->disk('public')
-                    ->downloadable()
-                    ->openable()
-                    ->visible(fn (Get $get) => in_array($get('status'), ['selesai']))
-                    ->columnSpanFull(),
-                Forms\Components\Placeholder::make('keterangan')
-                    ->label('Keterangan Perbaikan') // Tetap tampilkan label
-                    ->content(fn ($record): ?string => $record?->keterangan) // Ambil konten dari record
-                    ->columnSpanFull()
-                                // Opsional: Sembunyikan field ini jika keterangannya kosong
-                    ->hidden(fn ($record): bool => empty($record?->keterangan)), 
+                Forms\Components\Section::make('Informasi Permohonan')
+                    ->schema([
+                        Forms\Components\TextInput::make('judul')
+                            ->required()
+                            ->maxLength(100)
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make('isi')
+                            ->required()
+                            ->rows(10)
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make('surat_permohonan')
+                            ->label('Upload Surat Permohonan (PDF)')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->directory('permohonan')
+                            ->disk('public')
+                            ->downloadable()
+                            ->openable()
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                Forms\Components\Section::make('Jenis Pengujian & Biaya')
+                    ->schema([
+                        Forms\Components\TextInput::make('total_biaya')
+                            ->label('Total Biaya')
+                            ->prefix('Rp')
+                            ->numeric()
+                            ->readOnly()
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                Forms\Components\Section::make('Laporan Hasil')
+                    ->schema([
+                        Forms\Components\FileUpload::make('laporan_hasil')
+                            ->label('Upload Laporan Hasil (PDF)')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->directory('permohonan')
+                            ->disk('public')
+                            ->downloadable()
+                            ->openable()
+                            ->visible(fn (Get $get) => in_array($get('status'), ['menyusun_laporan', 'selesai']))
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                Forms\Components\Section::make('Keterangan Perbaikan')
+                    ->schema([
+                        Forms\Components\Placeholder::make('keterangan')
+                            ->label('Keterangan Perbaikan')
+                            ->content(fn ($record): ?string => $record?->keterangan)
+                            ->columnSpanFull()
+                            ->hidden(fn ($record): bool => empty($record?->keterangan)),
+                    ])
+                    ->columns(2),
             ]);
     }
 
@@ -83,15 +89,23 @@ class PermohonanResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (Permohonan $record): string => match ($record->status) {
-                        'permohonan_masuk' => 'gray',
-                        'verifikasi_berkas' => 'info',
+                        'menunggu_verifikasi' => 'gray',
                         'perlu_perbaikan' => 'warning',
-                        'terverifikasi' => 'success',
-                        'menunggu_sampel_dan_pembayaran' => 'warning',
-                        'proses_administrasi' => 'info',
-                        'pengujian' => 'info',
+                        'menunggu_pembayaran_sampel' => 'info',
+                        'sedang_diuji' => 'info',
+                        'menyusun_laporan' => 'warning',
                         'selesai' => 'success',
                         default => 'secondary',
+                    })
+                    ->label('Status')
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'menunggu_verifikasi' => 'Menunggu Verifikasi',
+                        'perlu_perbaikan' => 'Perlu Perbaikan',
+                        'menunggu_pembayaran_sampel' => 'Menunggu Pembayaran & Sampel',
+                        'sedang_diuji' => 'Sedang Diuji',
+                        'menyusun_laporan' => 'Menyusun Laporan',
+                        'selesai' => 'Selesai',
+                        default => 'Unknown',
                     })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total_biaya')
@@ -125,26 +139,30 @@ class PermohonanResource extends Resource
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn() => auth()->user()->hasRole('Admin')),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('verifikasi_berkas')
-                        ->label('Verifikasi Berkas')
-                        ->icon('heroicon-o-check')
+                    Tables\Actions\Action::make('lanjut_pembayaran_sampel')
+                        ->label('Terima - Lanjut Pembayaran')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
                         ->requiresConfirmation()
                         ->visible(fn (Permohonan $record) => 
-                            $record->status === 'permohonan_masuk' && 
-                            auth()->user()->hasRole('Petugas'))
+                            $record->status === 'menunggu_verifikasi' && 
+                            auth()->user()->hasRole('Petugas') &&
+                            ($record->worker_id === null || $record->worker_id === auth()->id()))
                         ->action(function (Permohonan $record) {
                             $record->update([
-                                'status' => 'verifikasi_berkas',
-                                'worker_id' => auth()->id()
+                                'status' => 'menunggu_pembayaran_sampel',
+                                'worker_id' => auth()->id(),
+                                'keterangan' => null // Clear keterangan when accepting
                             ]);
                         }),
-                    Tables\Actions\Action::make('perlu_perbaikan')
-                        ->label('Perlu Perbaikan')
+                    Tables\Actions\Action::make('tolak_perbaikan')
+                        ->label('Tolak - Perlu Perbaikan')
                         ->icon('heroicon-o-x-mark')
                         ->color('warning')
                         ->visible(fn (Permohonan $record) => 
-                            $record->status === 'verifikasi_berkas' && 
-                            auth()->user()->hasRole('Petugas'))
+                            $record->status === 'menunggu_verifikasi' && 
+                            auth()->user()->hasRole('Petugas') &&
+                            ($record->worker_id === null || $record->worker_id === auth()->id()))
                         ->form([
                             Forms\Components\Textarea::make('keterangan')
                                 ->label('Keterangan Perbaikan')
@@ -153,48 +171,43 @@ class PermohonanResource extends Resource
                         ->action(function (Permohonan $record, array $data) {
                             $record->update([
                                 'status' => 'perlu_perbaikan',
-                                'keterangan' => $data['keterangan']
+                                'keterangan' => $data['keterangan'],
+                                'worker_id' => auth()->id()
                             ]);
-                        }),
-                    Tables\Actions\Action::make('terverifikasi')
-                        ->label('Terverifikasi')
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->requiresConfirmation()
-                        ->visible(fn (Permohonan $record) => 
-                            $record->status === 'verifikasi_berkas' && 
-                            auth()->user()->hasRole('Petugas'))
-                        ->action(function (Permohonan $record) {
-                            $record->update(['status' => 'terverifikasi']);
-                        }),
-                    Tables\Actions\Action::make('konfirmasi_sampel')
-                        ->label('Konfirmasi Sampel & Pembayaran')
-                        ->icon('heroicon-o-banknotes')
-                        ->requiresConfirmation()
-                        ->visible(fn (Permohonan $record) => 
-                            $record->status === 'terverifikasi' && 
-                            auth()->user()->hasRole('Petugas'))
-                        ->action(function (Permohonan $record) {
-                            $record->update(['status' => 'proses_administrasi']);
                         }),
                     Tables\Actions\Action::make('mulai_pengujian')
                         ->label('Mulai Pengujian')
                         ->icon('heroicon-o-beaker')
+                        ->color('info')
                         ->requiresConfirmation()
                         ->visible(fn (Permohonan $record) => 
-                            $record->status === 'proses_administrasi' && 
-                            auth()->user()->hasRole('Petugas'))
+                            $record->status === 'menunggu_pembayaran_sampel' && 
+                            auth()->user()->hasRole('Petugas') &&
+                            $record->worker_id === auth()->id())
                         ->action(function (Permohonan $record) {
-                            $record->update(['status' => 'pengujian']);
+                            $record->update(['status' => 'sedang_diuji']);
                         }),
-                    Tables\Actions\Action::make('selesai')
-                        ->label('Selesai')
+                    Tables\Actions\Action::make('selesai_pengujian')
+                        ->label('Selesai Pengujian - Menyusun Laporan')
+                        ->icon('heroicon-o-document-text')
+                        ->color('warning')
+                        ->requiresConfirmation()
+                        ->visible(fn (Permohonan $record) => 
+                            $record->status === 'sedang_diuji' && 
+                            auth()->user()->hasRole('Petugas') &&
+                            $record->worker_id === auth()->id())
+                        ->action(function (Permohonan $record) {
+                            $record->update(['status' => 'menyusun_laporan']);
+                        }),
+                    Tables\Actions\Action::make('finalisasi_selesai')
+                        ->label('Finalisasi - Selesai')
                         ->icon('heroicon-o-check-badge')
                         ->color('success')
                         ->requiresConfirmation()
                         ->visible(fn (Permohonan $record) => 
-                            $record->status === 'pengujian' && 
-                            auth()->user()->hasRole('Petugas'))
+                            $record->status === 'menyusun_laporan' && 
+                            auth()->user()->hasRole('Petugas') &&
+                            $record->worker_id === auth()->id())
                         ->form([
                             Forms\Components\FileUpload::make('laporan_hasil')
                                 ->label('Upload Laporan Hasil (PDF)')
@@ -225,7 +238,7 @@ class PermohonanResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\JenisPengujiansRelationManager::class,
         ];
     }
 
