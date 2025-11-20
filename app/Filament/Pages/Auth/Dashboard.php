@@ -6,6 +6,6 @@ class Dashboard extends \Filament\Pages\Dashboard
 {
     public function getColumns(): int | string | array
 {
-    return 1;
+    return 2;
 }
 }

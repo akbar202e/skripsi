@@ -188,7 +188,7 @@ class PermohonanResource extends Resource
                             $record->update(['status' => 'sedang_diuji']);
                         }),
                     Tables\Actions\Action::make('selesai_pengujian')
-                        ->label('Selesai Pengujian - Menyusun Laporan')
+                        ->label('Menyusun Laporan')
                         ->icon('heroicon-o-document-text')
                         ->color('warning')
                         ->requiresConfirmation()

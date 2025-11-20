@@ -12,6 +12,7 @@ class RegisterCustom extends Register
     protected function mutateFormDataBeforeRegister(array $data): array
     {
         $data['password'] = Hash::make($data['password']);
+        unset($data['password_confirmation']);
         return $data;
     }
 
@@ -42,11 +43,30 @@ class RegisterCustom extends Register
                 ->required()
                 ->unique($this->getUserModel()),
 
+            TextInput::make('instansi')
+                ->label('Instansi')
+                ->required()
+                ->maxLength(255),
+
+            TextInput::make('no_hp')
+                ->label('Nomor HP')
+                ->tel()
+                ->required()
+                ->maxLength(20),
+
             TextInput::make('password')
                 ->label('Password')
                 ->password()
+                ->revealable()
                 ->required()
                 ->rule(\Illuminate\Validation\Rules\Password::default()),
+
+            TextInput::make('password_confirmation')
+                ->label('Konfirmasi Password')
+                ->password()
+                ->revealable()
+                ->required()
+                ->same('password'),
         ]);
     }
 }
