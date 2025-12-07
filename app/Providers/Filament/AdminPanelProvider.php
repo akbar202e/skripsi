@@ -33,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login(LoginCustom::class)
             ->registration(RegisterCustom::class)
+            ->profile(isSimple: false)
             ->brandName('UPT LAB.')
             ->colors([
                 'primary' => Color::Amber,

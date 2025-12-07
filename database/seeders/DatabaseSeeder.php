@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            JenisPengujianSeeder::class
+            JenisPengujianSeeder::class,
+            PaymentMethodSeeder::class,
         ]);
 
         // Create Admin user if not exists

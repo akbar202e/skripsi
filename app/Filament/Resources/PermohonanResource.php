@@ -55,6 +55,21 @@ class PermohonanResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
+                Forms\Components\Section::make('Status Pembayaran & Sampel')
+                    ->schema([
+                        Forms\Components\Checkbox::make('is_paid')
+                            ->label('Pembayaran Selesai')
+                            ->disabled(fn ($record) => $record && $record->is_paid)
+                            ->helperText('Otomatis terisi TRUE ketika pembayaran berhasil melalui gateway')
+                            ->columnSpanFull(),
+                        Forms\Components\Checkbox::make('is_sample_ready')
+                            ->label('Sampel Sudah Diterima')
+                            ->helperText('Centang ketika sampel sudah diterima dari pemohon')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->visible(fn (Get $get) => $get('status') === 'menunggu_pembayaran_sampel'),
+
                 Forms\Components\Section::make('Laporan Hasil')
                     ->schema([
                         Forms\Components\FileUpload::make('laporan_hasil')
@@ -108,6 +123,16 @@ class PermohonanResource extends Resource
                         default => 'Unknown',
                     })
                     ->searchable(),
+                Tables\Columns\IconColumn::make('is_paid')
+                    ->label('Pembayaran')
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->visible(fn () => auth()->user()->hasRole('Petugas')),
+                Tables\Columns\IconColumn::make('is_sample_ready')
+                    ->label('Sampel')
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    ->visible(fn () => auth()->user()->hasRole('Petugas')),
                 Tables\Columns\TextColumn::make('total_biaya')
                     ->money('IDR')
                     ->sortable(),
@@ -183,7 +208,9 @@ class PermohonanResource extends Resource
                         ->visible(fn (Permohonan $record) => 
                             $record->status === 'menunggu_pembayaran_sampel' && 
                             auth()->user()->hasRole('Petugas') &&
-                            $record->worker_id === auth()->id())
+                            $record->worker_id === auth()->id() &&
+                            $record->is_paid &&
+                            $record->is_sample_ready)
                         ->action(function (Permohonan $record) {
                             $record->update(['status' => 'sedang_diuji']);
                         }),
