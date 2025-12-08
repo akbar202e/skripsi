@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PembayaranResource\Pages;
 
 use App\Filament\Resources\PembayaranResource;
+use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewPembayaran extends ViewRecord
@@ -12,7 +13,13 @@ class ViewPembayaran extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            // No actions
+            Actions\Action::make('download_nota')
+                ->label('Download Nota')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('primary')
+                ->visible(fn () => $this->record->status === 'success')
+                ->url(fn () => route('payment.nota', $this->record))
+                ->openUrlInNewTab(),
         ];
     }
 }

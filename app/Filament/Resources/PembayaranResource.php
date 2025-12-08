@@ -9,7 +9,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Actions;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class PembayaranResource extends Resource
 {
@@ -162,8 +164,21 @@ class PembayaranResource extends Resource
                         'expired' => 'Kadaluarsa',
                     ]),
             ])
+            ->modifyQueryUsing(function (Builder $query) {
+                // Jika user adalah Pemohon, hanya tampilkan pembayaran miliknya
+                if (auth()->user()->hasRole('Pemohon')) {
+                    $query->where('user_id', auth()->id());
+                }
+            })
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('download_nota')
+                    ->label('Nota')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->status === 'success')
+                    ->url(fn ($record) => route('payment.nota', $record))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

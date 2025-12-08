@@ -41,9 +41,14 @@
                                         </td>
                                         <td class="px-4 py-3 text-sm">
                                             @if($pembayaran->isSuccessful())
-                                                <a href="{{ route('payment.invoice', $pembayaran) }}" class="text-blue-600 hover:text-blue-700 underline">
-                                                    Invoice
-                                                </a>
+                                                <div class="flex gap-3">
+                                                    <a href="{{ route('payment.invoice', $pembayaran) }}" class="text-blue-600 hover:text-blue-700 underline">
+                                                        Invoice
+                                                    </a>
+                                                    <a href="{{ route('payment.nota', $pembayaran) }}" class="text-green-600 hover:text-green-700 underline">
+                                                        Nota
+                                                    </a>
+                                                </div>
                                             @endif
                                         </td>
                                     </tr>

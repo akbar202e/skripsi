@@ -8,6 +8,7 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewPermohonan extends ViewRecord
@@ -20,6 +21,18 @@ class ViewPermohonan extends ViewRecord
         $actions = [
             Actions\EditAction::make(),
         ];
+
+        // Tombol Pembayaran untuk user yang mengajukan
+        if (auth()->user()->id === $record->user_id) {
+            if ($record->status === 'menunggu_pembayaran_sampel' && !$record->is_paid) {
+                $actions[] = Actions\Action::make('lakukan_pembayaran')
+                    ->label('Lakukan Pembayaran')
+                    ->icon('heroicon-o-credit-card')
+                    ->color('success')
+                    ->url(route('payment.show', $record))
+                    ->openUrlInNewTab();
+            }
+        }
 
         // Add status action buttons based on current status
         if (auth()->user()?->hasRole('Petugas')) {
@@ -57,7 +70,26 @@ class ViewPermohonan extends ViewRecord
                     });
             }
 
-            if ($record->status === 'menunggu_pembayaran_sampel' && $record->worker_id === auth()->id()) {
+            if ($record->status === 'menunggu_pembayaran_sampel' && $record->worker_id === auth()->id() && !$record->is_sample_ready) {
+                $actions[] = Actions\Action::make('konfirmasi_sampel')
+                    ->label('Konfirmasi Sampel Diterima')
+                    ->icon('heroicon-o-inbox-stack')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->modalHeading('Konfirmasi Sampel Diterima')
+                    ->modalDescription('Apakah Anda yakin sampel sudah diterima dari pemohon? Centang "Sampel Sudah Diterima" akan membuka halaman pengujian.')
+                    ->action(function () use ($record) {
+                        $record->update(['is_sample_ready' => true]);
+                        $this->dispatch('refreshPageData');
+                        Notification::make()
+                            ->success()
+                            ->title('Konfirmasi Berhasil')
+                            ->body('Sampel telah dikonfirmasi diterima.')
+                            ->send();
+                    });
+            }
+            
+            if ($record->status === 'menunggu_pembayaran_sampel' && $record->worker_id === auth()->id() && $record->is_paid && $record->is_sample_ready) {
                 $actions[] = Actions\Action::make('mulai_pengujian')
                     ->label('Mulai Pengujian')
                     ->icon('heroicon-o-beaker')

@@ -18,6 +18,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/permohonan/{permohonan}/process', [PaymentController::class, 'process'])->name('process');
         Route::get('/permohonan/{permohonan}/history', [PaymentController::class, 'history'])->name('history');
         Route::get('/invoice/{pembayaran}', [PaymentController::class, 'invoice'])->name('invoice');
+        Route::get('/{pembayaran}/nota', [PaymentController::class, 'downloadNota'])->name('nota');
     });
 });
 

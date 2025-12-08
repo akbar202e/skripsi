@@ -12,7 +12,7 @@ class PembayaranPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['Admin', 'Petugas']);
+        return $user->hasRole(['Admin', 'Petugas', 'Pemohon']);
     }
 
     /**
@@ -20,7 +20,17 @@ class PembayaranPolicy
      */
     public function view(User $user, Pembayaran $pembayaran): bool
     {
-        return $user->hasRole(['Admin', 'Petugas']);
+        // Admin dan Petugas bisa lihat semua
+        if ($user->hasRole(['Admin', 'Petugas'])) {
+            return true;
+        }
+        
+        // Pemohon hanya bisa lihat pembayaran miliknya sendiri
+        if ($user->hasRole('Pemohon')) {
+            return $user->id === $pembayaran->user_id;
+        }
+        
+        return false;
     }
 
     /**

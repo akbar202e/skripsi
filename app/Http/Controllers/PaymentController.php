@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pembayaran;
 use App\Models\Permohonan;
 use App\Services\DuitkuPaymentService;
+use App\Services\NotaPembayaranService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -166,6 +167,10 @@ class PaymentController extends Controller
 
     /**
      * Return URL setelah payment
+     * 
+     * IMPORTANT: Kita TRUST parameter dari return URL lebih daripada API check
+     * Karena Duitku mengirim return URL langsung dari server pembayaran (lebih akurat)
+     * Sementara API check mungkin ada delay propagation
      */
     public function return(Request $request)
     {
@@ -180,18 +185,63 @@ class PaymentController extends Controller
                 ->with('error', 'Pembayaran tidak ditemukan');
         }
 
-        // Check transaction status untuk mendapatkan status terbaru
-        $status = $this->duitkuService->checkTransactionStatus($pembayaran);
+        // Log return URL parameter
+        Log::info('Payment Return URL Called', [
+            'merchantOrderId' => $merchantOrderId,
+            'resultCode' => $resultCode,
+            'reference' => $reference,
+            'pembayaran_id' => $pembayaran->id,
+        ]);
 
-        if ($status['statusCode'] === '00') {
+        // STRATEGY: Trust return URL parameter lebih daripada API check
+        // Return URL datang langsung dari Duitku payment server (real-time)
+        // Sementara API check mungkin ada delay
+        
+        if ($resultCode === '00') {
+            // ✅ PAYMENT SUCCESSFUL - dari parameter return URL
+            $pembayaran->update([
+                'status' => 'success',
+                'result_code' => '00',
+                'duitku_reference' => $reference,
+                'paid_at' => now(),
+            ]);
+
+            // Update permohonan is_paid status
+            $pembayaran->permohonan->update(['is_paid' => true]);
+
+            Log::info('Payment marked as success via return URL parameter', [
+                'pembayaran_id' => $pembayaran->id,
+                'reference' => $reference,
+                'resultCode' => $resultCode,
+            ]);
+
             return redirect()->route('filament.admin.pages.dashboard')
                 ->with('success', 'Pembayaran berhasil! Silahkan tunggu verifikasi sampel dari petugas.');
-        } elseif ($status['statusCode'] === '01') {
+        } elseif ($resultCode === '01') {
+            // ⏳ PAYMENT PENDING
+            Log::info('Payment still pending', [
+                'pembayaran_id' => $pembayaran->id,
+                'resultCode' => $resultCode,
+            ]);
+
             return redirect()->route('payment.show', $pembayaran->permohonan)
-                ->with('warning', 'Pembayaran masih dalam proses');
+                ->with('warning', 'Pembayaran masih dalam proses. Tunggu beberapa saat kemudian coba lagi.');
         } else {
+            // ❌ PAYMENT FAILED - dari return URL parameter
+            $pembayaran->update([
+                'status' => 'failed',
+                'result_code' => $resultCode ?? '02',
+                'duitku_reference' => $reference,
+            ]);
+
+            Log::warning('Payment failed via return URL parameter', [
+                'pembayaran_id' => $pembayaran->id,
+                'resultCode' => $resultCode,
+                'reference' => $reference,
+            ]);
+
             return redirect()->route('payment.show', $pembayaran->permohonan)
-                ->with('error', 'Pembayaran gagal atau dibatalkan');
+                ->with('error', 'Pembayaran gagal atau dibatalkan. Silahkan coba lagi atau gunakan metode pembayaran lain.');
         }
     }
 
@@ -230,5 +280,22 @@ class PaymentController extends Controller
             'pembayaran' => $pembayaran,
             'permohonan' => $pembayaran->permohonan,
         ]);
+    }
+
+    /**
+     * Download nota pembayaran PDF
+     */
+    public function downloadNota(Pembayaran $pembayaran)
+    {
+        // Authorization check - user dapat download nota miliknya sendiri
+        if (Auth::user()->id !== $pembayaran->user_id && !Auth::user()->hasAnyRole(['Admin', 'Petugas'])) {
+            abort(403, 'Anda tidak memiliki akses untuk download nota ini');
+        }
+
+        // Generate dan download PDF nota pembayaran
+        $pdf = NotaPembayaranService::generatePdf($pembayaran);
+        $filename = 'NOTA-' . $pembayaran->merchant_order_id . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

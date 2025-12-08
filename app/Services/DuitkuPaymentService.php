@@ -263,4 +263,65 @@ class DuitkuPaymentService
             ];
         }
     }
+
+    /**
+     * Process successful payment manually
+     * Used for manual verification or when callback is not received
+     */
+    public function processSuccessfulPayment(Pembayaran $pembayaran, string $resultCode = '00', ?string $reference = null): bool
+    {
+        try {
+            $pembayaran->update([
+                'status' => 'success',
+                'result_code' => $resultCode,
+                'duitku_reference' => $reference ?? $pembayaran->duitku_reference,
+                'paid_at' => now(),
+            ]);
+
+            // Update permohonan is_paid status
+            $pembayaran->permohonan->update(['is_paid' => true]);
+
+            Log::info('Payment marked as success', [
+                'pembayaran_id' => $pembayaran->id,
+                'reference' => $reference,
+            ]);
+
+            return true;
+        } catch (Exception $e) {
+            Log::error('Error processing successful payment', [
+                'pembayaran_id' => $pembayaran->id,
+                'message' => $e->getMessage()
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Process failed payment manually
+     */
+    public function processFailedPayment(Pembayaran $pembayaran, string $resultCode = '02', ?string $reference = null): bool
+    {
+        try {
+            $pembayaran->update([
+                'status' => 'failed',
+                'result_code' => $resultCode,
+                'duitku_reference' => $reference ?? $pembayaran->duitku_reference,
+            ]);
+
+            Log::info('Payment marked as failed', [
+                'pembayaran_id' => $pembayaran->id,
+                'result_code' => $resultCode,
+            ]);
+
+            return true;
+        } catch (Exception $e) {
+            Log::error('Error processing failed payment', [
+                'pembayaran_id' => $pembayaran->id,
+                'message' => $e->getMessage()
+            ]);
+
+            return false;
+        }
+    }
 }
