@@ -1,0 +1,331 @@
+@startuml UPT2 System MVC Class Diagram
+!theme plain
+skinparam linetype ortho
+skinparam classBackgroundColor #FEFEFE
+skinparam classBorderColor #333333
+skinparam arrowColor #333333
+
+' ==================== PACKAGE ORGANIZATION ====================
+package "Models (Data Layer)" as Models {
+    class User {
+        - id: int
+        - name: string
+        - email: string
+        - password: string
+        - email_verified_at: datetime
+        - created_at: datetime
+        - updated_at: datetime
+        - deleted_at: datetime
+        --
+        + getRoles(): Collection
+        + hasRole(role: string): bool
+        + hasPermission(permission: string): bool
+        + assignRole(role: string): void
+        + revokeRole(role: string): void
+    }
+
+    class Permohonan {
+        - id: int
+        - judul: string
+        - isi: text
+        - user_id: int (FK)
+        - worker_id: int (FK)
+        - status: string
+        - surat_permohonan: string
+        - laporan_hasil: string
+        - total_biaya: decimal
+        - keterangan: text
+        - is_paid: boolean
+        - is_sample_ready: boolean
+        - created_at: datetime
+        - updated_at: datetime
+        - deleted_at: datetime
+        --
+        + pemohon(): BelongsTo
+        + worker(): BelongsTo
+        + jenisPengujians(): BelongsToMany
+        + pembayarans(): HasMany
+        + latestPembayaran(): HasOne
+    }
+
+    class JenisPengujian {
+        - id: int
+        - nama_pengujian: string
+        - biaya: decimal
+        - deskripsi: text
+        - created_at: datetime
+        - updated_at: datetime
+        --
+        + permohonans(): BelongsToMany
+    }
+
+    class Pembayaran {
+        - id: int
+        - permohonan_id: int (FK)
+        - user_id: int (FK)
+        - amount: decimal
+        - payment_method: string
+        - payment_method_name: string
+        - merchant_order_id: string
+        - duitku_reference: string
+        - va_number: string
+        - payment_url: string
+        - status: string
+        - result_code: string
+        - paid_at: datetime
+        - notes: text
+        - created_at: datetime
+        - updated_at: datetime
+        --
+        + permohonan(): BelongsTo
+        + user(): BelongsTo
+        + isSuccessful(): bool
+        + isPending(): bool
+        + isFailed(): bool
+    }
+
+    class Dokumen {
+        - id: int
+        - judul: string
+        - deskripsi: text
+        - kategori: string
+        - image_path: string
+        - created_by: int (FK)
+        - created_at: datetime
+        - updated_at: datetime
+        --
+        + creator(): BelongsTo
+    }
+
+    class PermohonanPengujian {
+        - permohonan_id: int (FK)
+        - jenis_pengujian_id: int (FK)
+        - jumlah_sampel: int
+        - created_at: datetime
+        - updated_at: datetime
+    }
+}
+
+' ==================== FILAMENT RESOURCES (VIEW LAYER) ====================
+package "Filament Resources (View/Admin Panel)" as Views {
+    class PermohonanResource {
+        - model: Permohonan
+        - navigationIcon: string
+        - navigationLabel: string
+        --
+        + form(form: Form): Form
+        + table(table: Table): Table
+        + getRelations(): array
+        + getPages(): array
+    }
+
+    class UserResource {
+        - model: User
+        - navigationIcon: string
+        - navigationLabel: string
+        --
+        + form(form: Form): Form
+        + table(table: Table): Table
+        + getPages(): array
+    }
+
+    class JenisPengujianResource {
+        - model: JenisPengujian
+        - navigationIcon: string
+        - navigationLabel: string
+        --
+        + form(form: Form): Form
+        + table(table: Table): Table
+        + getPages(): array
+    }
+
+    class PembayaranResource {
+        - model: Pembayaran
+        - navigationIcon: string
+        - navigationLabel: string
+        --
+        + form(form: Form): Form
+        + table(table: Table): Table
+        + getPages(): array
+    }
+
+    class DokumenResource {
+        - model: Dokumen
+        - navigationIcon: string
+        - navigationLabel: string
+        --
+        + form(form: Form): Form
+        + table(table: Table): Table
+        + getPages(): array
+    }
+}
+
+' ==================== CONTROLLERS (CONTROL LAYER) ====================
+package "Controllers (Business Logic)" as Controllers {
+    class PaymentController {
+        - paymentService: PaymentService
+        --
+        + store(request: Request): Response
+        + callback(request: Request): Response
+        + verify(payment: Pembayaran): bool
+        + handlePaymentSuccess(payment: Pembayaran): void
+        + handlePaymentFailed(payment: Pembayaran): void
+    }
+
+    class DokumenController {
+        - dokumentService: DokumenService
+        --
+        + index(): Response
+        + create(request: Request): Response
+        + update(request: Request, dokumen: Dokumen): Response
+        + delete(dokumen: Dokumen): Response
+    }
+
+    class Controller {
+        --
+        + middleware(middleware: string): void
+    }
+}
+
+' ==================== POLICIES (AUTHORIZATION) ====================
+package "Policies (Authorization Layer)" as Policies {
+    class PermohonanPolicy {
+        --
+        + viewAny(user: User): bool
+        + view(user: User, permohonan: Permohonan): bool
+        + create(user: User): bool
+        + update(user: User, permohonan: Permohonan): bool
+        + delete(user: User, permohonan: Permohonan): bool
+    }
+
+    class PembayaranPolicy {
+        --
+        + viewAny(user: User): bool
+        + view(user: User, pembayaran: Pembayaran): bool
+    }
+
+    class DokumenPolicy {
+        --
+        + viewAny(user: User): bool
+        + view(user: User, dokumen: Dokumen): bool
+        + create(user: User): bool
+        + update(user: User, dokumen: Dokumen): bool
+    }
+}
+
+' ==================== OBSERVERS (LIFECYCLE HOOKS) ====================
+package "Observers (Event Handlers)" as Observers {
+    class PermohonanObserver {
+        --
+        + creating(permohonan: Permohonan): void
+        + created(permohonan: Permohonan): void
+        + updating(permohonan: Permohonan): void
+        + updated(permohonan: Permohonan): void
+        + deleted(permohonan: Permohonan): void
+    }
+}
+
+' ==================== SERVICES (BUSINESS LOGIC) ====================
+package "Services (Business Logic)" as Services {
+    class PaymentService {
+        --
+        + createPayment(permohonan: Permohonan, amount: decimal): Pembayaran
+        + initiateDuitkuPayment(pembayaran: Pembayaran): string
+        + verifyPayment(reference: string): bool
+        + updatePaymentStatus(pembayaran: Pembayaran, status: string): void
+    }
+
+    class DokumenService {
+        --
+        + storeDokumen(data: array): Dokumen
+        + updateDokumen(dokumen: Dokumen, data: array): void
+        + deleteDokumen(dokumen: Dokumen): void
+        + getByKategori(kategori: string): Collection
+    }
+}
+
+' ==================== RELATIONSHIPS ====================
+
+' Model Relationships
+User "1" --> "*" Permohonan : creates (pemohon)
+User "1" --> "*" Permohonan : manages (worker)
+User "1" --> "*" Pembayaran : makes
+User "1" --> "*" Dokumen : creates
+
+Permohonan "1" --> "*" Pembayaran : has
+Permohonan "1" --> "*" PermohonanPengujian : has
+JenisPengujian "1" --> "*" PermohonanPengujian : has
+
+' View to Model Mapping
+PermohonanResource --> Permohonan : manages
+UserResource --> User : manages
+JenisPengujianResource --> JenisPengujian : manages
+PembayaranResource --> Pembayaran : manages
+DokumenResource --> Dokumen : manages
+
+' Controller to Model Relationship
+PaymentController --> Pembayaran : manages
+PaymentController --> Permohonan : updates
+DokumenController --> Dokumen : manages
+
+' Controller Inheritance
+PaymentController --|> Controller
+DokumenController --|> Controller
+
+' Policy Authorization
+PermohonanPolicy --> Permohonan : authorizes
+PembayaranPolicy --> Pembayaran : authorizes
+DokumenPolicy --> Dokumen : authorizes
+
+' Observer Pattern
+PermohonanObserver --> Permohonan : listens
+
+' Service Dependencies
+PaymentController --> PaymentService : uses
+DokumenController --> DokumenService : uses
+
+note right of Models
+    **Data Layer**
+    - Represents application data
+    - Manages business rules
+    - Communicates with database
+end note
+
+note right of Views
+    **Presentation Layer**
+    - Filament Admin Panel
+    - Forms and Tables
+    - User Interface
+    - Uses Spatie Roles & Permissions
+end note
+
+note right of Controllers
+    **Business Logic Layer**
+    - Handles user requests
+    - Coordinates data and views
+    - Application flow control
+    - Payment processing
+end note
+
+note right of Policies
+    **Authorization Layer**
+    - Access control
+    - Role-based permissions
+    - User action validation
+end note
+
+note right of Observers
+    **Event Handler Layer**
+    - Lifecycle events
+    - State change tracking
+    - Notification triggers
+end note
+
+note right of Services
+    **Utility Layer**
+    - Reusable business logic
+    - Payment gateway integration
+    - Data operations
+end note
+
+@enduml
