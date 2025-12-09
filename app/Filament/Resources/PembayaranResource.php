@@ -49,7 +49,8 @@ class PembayaranResource extends Resource
                             ->prefix('Rp')
                             ->disabled()
                             ->dehydrated()
-                            ->formatStateUsing(fn ($state) => $state ? number_format($state, 0, ',', '.') : 0),
+                            ->inputMode('decimal')
+                            ->formatStateUsing(fn ($state) => $state ? (int)$state : 0),
                     ])->columns(3),
 
                 Forms\Components\Section::make('Detail Transaksi')

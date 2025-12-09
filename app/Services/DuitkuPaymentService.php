@@ -169,12 +169,16 @@ class DuitkuPaymentService
             if ($response->successful()) {
                 $data = $response->json();
                 if (isset($data['statusCode']) && $data['statusCode'] === '00') {
+                    // Get payment method name dari database
+                    $paymentMethodData = PaymentMethod::where('payment_method', $paymentMethod)->first();
+                    
                     // Update pembayaran dengan response dari Duitku
                     $pembayaran->update([
                         'duitku_reference' => $data['reference'] ?? null,
                         'va_number' => $data['vaNumber'] ?? null,
                         'payment_url' => $data['paymentUrl'] ?? null,
                         'payment_method' => $paymentMethod,
+                        'payment_method_name' => $paymentMethodData?->payment_name ?? $paymentMethod,
                         'status' => 'pending',
                     ]);
 

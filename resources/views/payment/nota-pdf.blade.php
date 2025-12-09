@@ -19,10 +19,10 @@
 
         .nota-container {
             width: 100%;
-            max-width: 21cm;
-            height: 29.7cm;
+            max-width: 19cm;
+            height: 25cm;
             margin: 0 auto;
-            padding: 1.5cm;
+            padding: 1cm;
             background: white;
         }
 
@@ -38,7 +38,7 @@
         .nota-header img {
             width: 80px;
             height: 100px;
-            filter: grayscale(100%);
+            object-fit: contain;
         }
 
         .header-text {
@@ -81,7 +81,7 @@
         }
 
         .nota-details td:first-child {
-            width: 150px;
+            width: 120px;
         }
 
         .item-table {
@@ -216,16 +216,25 @@
     </style>
 </head>
 <body>
+    
     <div class="nota-container">
         <!-- Header -->
         <div class="nota-header">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Coat_of_arms_of_Central_Kalimantan.svg" alt="Logo">
-            <div class="header-text">
-                <h1>UPT LAB. BAHAN KONSTRUKSI</h1>
-                <p>Dinas Pekerjaan Umum dan Penataan Ruang</p>
-                <p>Provinsi Kalimantan Tengah</p>
-                <p>Jalan Tjilik Riwut km. 3 Palangka Raya | Telp. (0536) 3222607</p>
-            </div>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tbody>
+              <tr>
+                <td style="width: 110px; vertical-align: top; padding: 0;">
+                              <img src="{{ storage_path('app/public/logo.png') }}" alt="Logo">
+                </td>
+                <td style="text-align: center; vertical-align: top; padding: 0;">
+                  <h1 style="font-size: 16pt; font-weight: bold; margin: 0;">UPT LAB. BAHAN KONSTRUKSI</h1>
+                  <p style="font-size: 11pt; margin: 2px 0;">Dinas Pekerjaan Umum dan Penataan Ruang</p>
+                  <p style="font-size: 11pt; margin: 2px 0;">Provinsi Kalimantan Tengah</p>
+                  <p style="font-size: 11pt; margin: 2px 0;">Jalan Tjilik Riwut km. 3 Palangka Raya | Telp. (0536) 3222607</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- Title -->
@@ -265,29 +274,61 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>{{ $pekerjaan }}</td>
-                    <td>1</td>
-                    <td style="text-align: right;">Rp {{ number_format($jumlahBayar, 0, ',', '.') }}</td>
-                    <td style="text-align: right;">Rp {{ number_format($totalKeseluruhan, 0, ',', '.') }}</td>
-                </tr>
+                @forelse($jenisPengujians as $index => $pengujian)
+                    @php
+                        $qty = $pengujian->pivot->jumlah_sampel ?? 1;
+                        $hargaSatuan = $pengujian->biaya ?? 0;
+                        $jumlah = $hargaSatuan * $qty;
+                    @endphp
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $pengujian->nama_pengujian }}</td>
+                        <td style="text-align: center;">{{ $qty }}</td>
+                        <td style="text-align: right;">Rp {{ number_format($hargaSatuan, 0, ',', '.') }}</td>
+                        <td style="text-align: right;">Rp {{ number_format($jumlah, 0, ',', '.') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td>1</td>
+                        <td>{{ $pekerjaan }}</td>
+                        <td style="text-align: center;">1</td>
+                        <td style="text-align: right;">Rp {{ number_format($jumlahBayar, 0, ',', '.') }}</td>
+                        <td style="text-align: right;">Rp {{ number_format($totalKeseluruhan, 0, ',', '.') }}</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
+
+        <!-- Summary Section -->
+        <!-- <table style="width: 100%; margin: 10px 0; font-size: 11pt;">
+            <tr>
+                <td style="text-align: right; width: 50%;">Jumlah Bayar:</td>
+                <td style="text-align: right; width: 50%; font-weight: bold;">Rp {{ number_format($totalKeseluruhan, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td style="text-align: right;">Metode Pembayaran:</td>
+                <td style="text-align: right; font-weight: bold;">{{ $metode }}</td>
+            </tr>
+            <tr>
+                <td style="text-align: right;">Total:</td>
+                <td style="text-align: right; font-weight: bold;">Rp {{ number_format($totalKeseluruhan, 0, ',', '.') }}</td>
+            </tr>
+        </table> -->
 
         <!-- Total Section -->
         <div class="total-section">
             <div class="terbilang">
-                Terbilang: {{ \App\Services\TerbilangService::toTerbilang($totalKeseluruhan) }} Rupiah
+                Terbilang: {{ ucfirst(\App\Services\TerbilangService::toTerbilang((int)$totalKeseluruhan)) }} rupiah
             </div>
+            
 
             <table class="signature-table">
                 <tr>
                     <td class="signature-left">
-                        <div>Bendahara Penerima</div>
+                        <!-- <div>Bendahara Penerima</div>
                         <div class="signature-space"></div>
-                        <div class="signature-name">-</div>
-                        <div class="signature-nip">NIP. -</div>
+                        <div class="signature-name">TINAWATI</div>
+                        <div class="signature-nip">NIP.197501201998032006</div> -->
                     </td>
                     <td class="signature-right">
                         <table class="total-detail-table">
@@ -302,6 +343,10 @@
                             <tr class="total-row">
                                 <th>TOTAL</th>
                                 <td>Rp {{ number_format($totalKeseluruhan, 0, ',', '.') }}</td>
+                            </tr>
+                            <tr>
+                                <th>Status Pembayaran</th>
+                                <td><b>LUNAS</b></td>
                             </tr>
                         </table>
                     </td>

@@ -17,23 +17,6 @@ class TerbilangService
         'sembilan'
     ];
 
-    private static array $tingkat = [
-        'puluh',
-        'ratus',
-        'ribu',
-        'puluh ribu',
-        'ratus ribu',
-        'juta',
-        'puluh juta',
-        'ratus juta',
-        'miliar',
-        'puluh miliar',
-        'ratus miliar',
-        'triliun',
-        'puluh triliun',
-        'ratus triliun'
-    ];
-
     /**
      * Convert number to terbilang (words in Indonesian)
      */
@@ -43,21 +26,97 @@ class TerbilangService
             return 'nol';
         }
 
-        $str = '';
-        $tingkat_idx = 0;
-
-        while ($num > 0) {
-            $angka_idx = $num % 10;
-
-            if ($angka_idx != 0) {
-                $str = self::$angka[$angka_idx] . ' ' . (isset(self::$tingkat[$tingkat_idx]) ? self::$tingkat[$tingkat_idx] : '') . ' ' . $str;
-            }
-
-            $num = (int)($num / 10);
-            $tingkat_idx++;
+        $result = '';
+        
+        // Triliun
+        if ($num >= 1000000000000) {
+            $triliun = (int)($num / 1000000000000);
+            $result .= self::convertBelowThousand($triliun) . ' triliun ';
+            $num %= 1000000000000;
         }
-
-        return trim(str_replace('  ', ' ', $str));
+        
+        // Miliar
+        if ($num >= 1000000000) {
+            $miliar = (int)($num / 1000000000);
+            $result .= self::convertBelowThousand($miliar) . ' miliar ';
+            $num %= 1000000000;
+        }
+        
+        // Juta
+        if ($num >= 1000000) {
+            $juta = (int)($num / 1000000);
+            $result .= self::convertBelowThousand($juta) . ' juta ';
+            $num %= 1000000;
+        }
+        
+        // Ribu
+        if ($num >= 1000) {
+            $ribu = (int)($num / 1000);
+            $result .= self::convertBelowThousand($ribu) . ' ribu ';
+            $num %= 1000;
+        }
+        
+        // Satuan
+        if ($num > 0) {
+            $result .= self::convertBelowThousand($num) . ' ';
+        }
+        
+        return trim(str_replace('  ', ' ', $result));
+    }
+    
+    /**
+     * Convert number below 1000
+     */
+    private static function convertBelowThousand(int $num): string
+    {
+        if ($num == 0) {
+            return '';
+        }
+        
+        $result = '';
+        
+        // Ratus
+        $hundreds = (int)($num / 100);
+        if ($hundreds > 0) {
+            if ($hundreds == 1) {
+                $result .= 'seratus';
+            } else {
+                $result .= self::$angka[$hundreds] . ' ratus';
+            }
+        }
+        
+        $num %= 100;
+        
+        if ($num > 0) {
+            if ($result !== '') {
+                $result .= ' ';
+            }
+            
+            if ($num < 10) {
+                // Satuan 1-9
+                $result .= self::$angka[$num];
+            } elseif ($num < 20) {
+                // 10-19
+                $tens = $num - 10;
+                if ($tens == 0) {
+                    $result .= 'sepuluh';
+                } elseif ($tens == 1) {
+                    $result .= 'sebelas';
+                } else {
+                    $result .= self::$angka[$tens] . ' belas';
+                }
+            } else {
+                // 20-99
+                $tens = (int)($num / 10);
+                $ones = $num % 10;
+                $result .= self::$angka[$tens] . ' puluh';
+                if ($ones > 0) {
+                    $result .= ' ' . self::$angka[$ones];
+                }
+            }
+        }
+        
+        return trim($result);
     }
 
     /**
