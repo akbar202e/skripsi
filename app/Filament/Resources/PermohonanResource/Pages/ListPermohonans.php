@@ -3,6 +3,10 @@
 namespace App\Filament\Resources\PermohonanResource\Pages;
 
 use App\Filament\Resources\PermohonanResource;
+use App\Filament\Widgets\BottleneckDetectionWidget;
+use App\Filament\Widgets\PermohonanWorkloadStats;
+use App\Filament\Widgets\Top5JenisPengujiansChart;
+use App\Filament\Widgets\VolumeSampelPerBulanChart;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Components\Tab;
@@ -19,6 +23,15 @@ class ListPermohonans extends ListRecords
         ];
     }
 
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            PermohonanWorkloadStats::class,
+            Top5JenisPengujiansChart::class,
+            VolumeSampelPerBulanChart::class,
+            BottleneckDetectionWidget::class,
+        ];
+    }
 
 public function getTabs(): array
 {

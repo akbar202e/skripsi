@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class PermohonanChart extends ChartWidget
 {
     protected static ?string $heading = 'Pendapatan Per Bulan';
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 2;
 
     protected function getData(): array
     {

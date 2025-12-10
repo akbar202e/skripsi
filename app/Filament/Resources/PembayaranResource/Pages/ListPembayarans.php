@@ -3,6 +3,9 @@
 namespace App\Filament\Resources\PembayaranResource\Pages;
 
 use App\Filament\Resources\PembayaranResource;
+use App\Filament\Widgets\PembayaranFinancialStats;
+use App\Filament\Widgets\PembayaranStatusStats;
+use App\Filament\Widgets\PembayaranTrendChart;
 use Filament\Resources\Pages\ListRecords;
 
 class ListPembayarans extends ListRecords
@@ -13,6 +16,15 @@ class ListPembayarans extends ListRecords
     {
         return [
             // No create action
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            PembayaranFinancialStats::class,
+            PembayaranStatusStats::class,
+            PembayaranTrendChart::class,
         ];
     }
 }

@@ -26,13 +26,25 @@ class Permohonan extends Model
         'total_biaya',
         'keterangan',
         'is_paid',
-        'is_sample_ready'
+        'is_sample_ready',
+        'verified_at',
+        'sample_received_at',
+        'testing_started_at',
+        'testing_ended_at',
+        'report_started_at',
+        'completed_at'
     ];
 
     protected $casts = [
         'total_biaya' => 'decimal:2',
         'is_paid' => 'boolean',
         'is_sample_ready' => 'boolean',
+        'verified_at' => 'datetime',
+        'sample_received_at' => 'datetime',
+        'testing_started_at' => 'datetime',
+        'testing_ended_at' => 'datetime',
+        'report_started_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     /**
