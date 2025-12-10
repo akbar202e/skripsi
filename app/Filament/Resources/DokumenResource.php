@@ -10,6 +10,8 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\ExportAction;
+use App\Filament\Exports\DokumenExporter;
 use Infolists\Components\TextInput;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
@@ -135,6 +137,11 @@ class DokumenResource extends Resource
                         'informasi' => 'Informasi',
                     ])
                     ->label('Filter Kategori'),
+            ])
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(DokumenExporter::class)
+                    ->label('Unduh Excel'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

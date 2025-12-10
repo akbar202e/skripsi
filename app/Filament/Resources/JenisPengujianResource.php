@@ -3,12 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\JenisPengujianResource\Pages;
+use App\Filament\Exports\JenisPengujianExporter;
 use App\Models\JenisPengujian;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\ExportAction;
 
 class JenisPengujianResource extends Resource
 {
@@ -56,6 +58,11 @@ class JenisPengujianResource extends Resource
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(JenisPengujianExporter::class)
+                    ->label('Unduh Excel'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

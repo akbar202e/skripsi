@@ -3,12 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PembayaranResource\Pages;
+use App\Filament\Exports\PembayaranExporter;
 use App\Models\Pembayaran;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\ExportAction;
 use Filament\Actions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -165,6 +167,11 @@ class PembayaranResource extends Resource
                         'expired' => 'Kadaluarsa',
                     ]),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(PembayaranExporter::class)
+                    ->label('Unduh Excel'),
+            ])
             ->modifyQueryUsing(function (Builder $query) {
                 // Jika user adalah Pemohon, hanya tampilkan pembayaran miliknya
                 if (auth()->user()->hasRole('Pemohon')) {
@@ -172,7 +179,6 @@ class PembayaranResource extends Resource
                 }
             })
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make('download_nota')
                     ->label('Nota')
                     ->icon('heroicon-o-arrow-down-tray')
