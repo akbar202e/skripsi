@@ -14,16 +14,13 @@ class JenisPengujianExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('nama')
+            ExportColumn::make('nama_pengujian')
                 ->label('Nama Jenis Pengujian'),
-            ExportColumn::make('harga')
-                ->label('Harga')
+            ExportColumn::make('biaya')
+                ->label('Biaya')
                 ->formatStateUsing(fn ($state): string => 'Rp ' . number_format($state, 0, ',', '.')),
             ExportColumn::make('deskripsi')
                 ->label('Deskripsi'),
-            ExportColumn::make('is_active')
-                ->label('Aktif')
-                ->formatStateUsing(fn (bool $state): string => $state ? 'Ya' : 'Tidak'),
             ExportColumn::make('created_at')
                 ->label('Dibuat Pada'),
             ExportColumn::make('updated_at')

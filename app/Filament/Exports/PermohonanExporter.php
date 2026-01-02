@@ -36,10 +36,10 @@ class PermohonanExporter extends Exporter
                 ->formatStateUsing(fn ($state): string => 'Rp ' . number_format($state, 0, ',', '.')),
             ExportColumn::make('is_paid')
                 ->label('Pembayaran Selesai')
-                ->formatStateUsing(fn (bool $state): string => $state ? 'Ya' : 'Tidak'),
+                ->formatStateUsing(fn ($state): string => $state ? 'Ya' : 'Tidak'),
             ExportColumn::make('is_sample_ready')
                 ->label('Sampel Diterima')
-                ->formatStateUsing(fn (bool $state): string => $state ? 'Ya' : 'Tidak'),
+                ->formatStateUsing(fn ($state): string => $state ? 'Ya' : 'Tidak'),
             ExportColumn::make('verified_at')
                 ->label('Waktu Verifikasi'),
             ExportColumn::make('sample_received_at')
