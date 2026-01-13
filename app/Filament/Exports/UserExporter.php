@@ -29,7 +29,7 @@ class UserExporter extends Exporter
 
     public function getFileName(Export $export): string
     {
-        return "users-{$export->getKey()}.xlsx";
+        return "users-{$export->getKey()}";
     }
 
     public static function getCompletedNotificationBody(Export $export): string

@@ -36,7 +36,7 @@ class DokumenExporter extends Exporter
 
     public function getFileName(Export $export): string
     {
-        return "dokumen-{$export->getKey()}.xlsx";
+        return "dokumen-{$export->getKey()}";
     }
 
     public static function getCompletedNotificationBody(Export $export): string

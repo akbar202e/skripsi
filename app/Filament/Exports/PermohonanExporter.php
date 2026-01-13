@@ -59,7 +59,7 @@ class PermohonanExporter extends Exporter
 
     public function getFileName(Export $export): string
     {
-        return "permohonan-{$export->getKey()}.xlsx";
+        return "permohonan-{$export->getKey()}";
     }
 
     public static function getCompletedNotificationBody(Export $export): string

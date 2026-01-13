@@ -30,7 +30,7 @@ class JenisPengujianExporter extends Exporter
 
     public function getFileName(Export $export): string
     {
-        return "jenis-pengujian-{$export->getKey()}.xlsx";
+        return "jenis-pengujian-{$export->getKey()}";
     }
 
     public static function getCompletedNotificationBody(Export $export): string

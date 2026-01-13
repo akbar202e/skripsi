@@ -53,7 +53,7 @@ class PembayaranExporter extends Exporter
 
     public function getFileName(Export $export): string
     {
-        return "pembayaran-{$export->getKey()}.xlsx";
+        return "pembayaran-{$export->getKey()}";
     }
 
     public static function getCompletedNotificationBody(Export $export): string
