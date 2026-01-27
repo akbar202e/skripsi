@@ -1,4 +1,4 @@
-@startuml UPT2 System MVC Class Diagram
+@startuml
 !theme plain
 skinparam linetype ortho
 skinparam classBackgroundColor #FEFEFE
@@ -106,8 +106,43 @@ package "Models (Data Layer)" as Models {
     }
 }
 
+' ==================== PUBLIC PAGES (PUBLIC VIEW LAYER) ====================
+package "Public Pages (Web Views)" as PublicViews {
+    class HomePage {
+        - navigationBar: Component
+        - heroSection: Component
+        - aboutSection: Component
+        - featuresSection: Component
+        - testingTypesSection: Component
+        - ctaSection: Component
+        - footer: Component
+        --
+        + displayJenisPengujian(jenisPengujian: Collection): void
+        + handleLoadMore(): void
+    }
+}
+
 ' ==================== FILAMENT RESOURCES (VIEW LAYER) ====================
 package "Filament Resources (View/Admin Panel)" as Views {
+    class Dashboard {
+        - navigationIcon: string
+        - navigationLabel: string
+        --
+        + getHeading(): string
+        + getSubHeading(): string
+        + getHeaderWidgets(): array
+        + getFooterWidgets(): array
+    }
+
+    class About {
+        - navigationIcon: string
+        - navigationLabel: string
+        - navigationGroup: string
+        --
+        + getHeading(): string
+        + getSubHeading(): string
+    }
+
     class PermohonanResource {
         - model: Permohonan
         - navigationIcon: string
@@ -162,10 +197,17 @@ package "Filament Resources (View/Admin Panel)" as Views {
 
 ' ==================== CONTROLLERS (CONTROL LAYER) ====================
 package "Controllers (Business Logic)" as Controllers {
+    class HomeController {
+        --
+        + index(): Response
+        - getLaboratoriesData(): array
+    }
+
     class PaymentController {
         - paymentService: PaymentService
         --
-        + store(request: Request): Response
+        + show(permohonan: Permohonan): Response
+        + process(request: Request): Response
         + callback(request: Request): Response
         + verify(payment: Pembayaran): bool
         + handlePaymentSuccess(payment: Pembayaran): void
@@ -176,6 +218,7 @@ package "Controllers (Business Logic)" as Controllers {
         - dokumentService: DokumenService
         --
         + index(): Response
+        + show(dokumen: Dokumen): Response
         + create(request: Request): Response
         + update(request: Request, dokumen: Dokumen): Response
         + delete(dokumen: Dokumen): Response
@@ -256,7 +299,16 @@ Permohonan "1" --> "*" Pembayaran : has
 Permohonan "1" --> "*" PermohonanPengujian : has
 JenisPengujian "1" --> "*" PermohonanPengujian : has
 
+' Public View to Model Mapping
+HomePage --> JenisPengujian : displays
+HomeController --> HomePage : renders
+HomeController --> JenisPengujian : fetches
+HomeController --|> Controller
+
 ' View to Model Mapping
+Dashboard --> Permohonan : displays
+Dashboard --> User : displays
+About --> JenisPengujian : displays
 PermohonanResource --> Permohonan : manages
 UserResource --> User : manages
 JenisPengujianResource --> JenisPengujian : manages
@@ -328,4 +380,19 @@ note right of Services
     - Data operations
 end note
 
+note right of PublicViews
+    **Public Web Pages**
+    - Accessible without authentication
+    - Display jenis pengujian list
+    - Load more pagination
+    - Static information pages
+end note
+
+note bottom of HomePage
+    Features:
+    - Navigation & Hero Section
+    - About & Features Display
+    - Testing Types Table (Load More)
+    - CTA & Footer
+end note
 @enduml

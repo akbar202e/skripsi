@@ -25,7 +25,9 @@ class DokumenResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document';
 
-    protected static ?string $navigationLabel = 'Informasi & Panduan';
+    protected static ?string $navigationGroup = 'Informasi';
+
+    protected static ?string $navigationLabel = 'Panduan & Informasi';
 
     protected static ?int $navigationSort = 2;
 

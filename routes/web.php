@@ -3,10 +3,18 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\HomeController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Login & Register routes (Filament handles these via its provider)
+Route::get('/login', function () {
+    return redirect('/admin/login');
+})->name('login');
+
+Route::get('/register', function () {
+    return redirect('/admin/register');
+})->name('register');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dokumen', [DokumenController::class, 'index'])->name('dokumen.index');
