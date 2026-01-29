@@ -366,7 +366,7 @@
             <ul class="nav-links">
                 <li><a href="#about">Tentang</a></li>
                 <li><a href="#features">Fitur</a></li>
-                <li><a href="#laboratories">Laboratorium</a></li>
+                <li><a href="#laboratories">Jenis Pengujian</a></li>
             </ul>
             <div class="nav-buttons">
                 @auth

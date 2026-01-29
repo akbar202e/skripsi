@@ -31,14 +31,14 @@ class PermohonanWorkloadStats extends BaseWidget
             ->whereNotNull('completed_at')
             ->get();
 
-        $averageTurnaroundHours = 0;
+        $averageTurnaroundDays = 0;
         if ($completedPermohonan->count() > 0) {
-            $totalHours = 0;
+            $totalDays = 0;
             foreach ($completedPermohonan as $permohonan) {
-                $hours = $permohonan->testing_started_at->diffInHours($permohonan->completed_at);
-                $totalHours += $hours;
+                $days = $permohonan->testing_started_at->diffInDays($permohonan->completed_at);
+                $totalDays += $days;
             }
-            $averageTurnaroundHours = round($totalHours / $completedPermohonan->count(), 1);
+            $averageTurnaroundDays = floor($totalDays / $completedPermohonan->count());
         }
 
         return [
@@ -46,7 +46,7 @@ class PermohonanWorkloadStats extends BaseWidget
                 ->description('Status: Sedang Diuji')
                 ->color('info')
                 ->icon('heroicon-o-beaker'),
-            Stat::make('Rata-rata Waktu Penyelesaian', $averageTurnaroundHours . ' jam')
+            Stat::make('Rata-rata Waktu Penyelesaian', $averageTurnaroundDays . ' hari')
                 ->description('Mulai Pengujian - Selesai')
                 ->color('success')
                 ->icon('heroicon-o-clock'),
