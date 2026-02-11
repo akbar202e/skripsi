@@ -166,11 +166,11 @@ class PermohonanResource extends Resource
                     ->label('Unduh Excel'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->visible(fn() => auth()->user()->hasRole('Admin')),
                 Tables\Actions\ActionGroup::make([
+                Tables\Actions\ViewAction::make(),
                     Tables\Actions\Action::make('lanjut_pembayaran_sampel')
                         ->label('Terima - Lanjut Pembayaran')
                         ->icon('heroicon-o-check-circle')

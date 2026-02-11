@@ -14,12 +14,6 @@ class PermohonanWorkloadStats extends BaseWidget
     {
         return auth()->check() && (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Petugas'));
     }
-
-    public function getHeading(): ?string
-    {
-        return 'Service & Performance Insight';
-    }
-
     protected function getStats(): array
     {
         // Workload stats
