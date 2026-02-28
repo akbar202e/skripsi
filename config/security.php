@@ -25,7 +25,7 @@ return [
         'Referrer-Policy' => 'strict-origin-when-cross-origin',
 
         // Content Security Policy
-        'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; form-action 'self'; base-uri 'self'; frame-ancestors 'self';",
+        'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com fonts.bunny.net; font-src 'self' fonts.gstatic.com fonts.bunny.net; img-src 'self' data: https:; connect-src 'self' https:; form-action 'self' http: https:; base-uri 'self'; frame-ancestors 'self';",
 
         // Permissions Policy (formerly Feature Policy)
         'Permissions-Policy' => 'camera=(), microphone=(), geolocation=()',

@@ -7,7 +7,7 @@ use Filament\Widgets\ChartWidget;
 
 class Top5JenisPengujiansChart extends ChartWidget
 {
-    protected static ?string $heading = 'Top 5 Jenis Pengujian Terlaris';
+    protected static ?string $heading = 'Jenis Pengujian Terbanyak';
     protected static ?int $sort = 2;
 
     public static function canView(): bool
