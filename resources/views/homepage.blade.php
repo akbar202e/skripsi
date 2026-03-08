@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPT LAB - Sistem Manajemen Permohonan Pengujian</title>
+    <title>UPT LBK - Sistem Manajemen Permohonan Pengujian</title>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         * {
@@ -362,7 +362,7 @@
     <!-- Navigation -->
     <nav>
         <div class="container">
-            <a href="/" class="logo">UPT LAB.</a>
+            <a href="/" class="logo">UPT LBK</a>
             <ul class="nav-links">
                 <li><a href="#about">Tentang</a></li>
                 <li><a href="#features">Fitur</a></li>
@@ -396,12 +396,12 @@
     <!-- About Section -->
     <section id="about" class="alt">
         <div class="container">
-            <h2>Tentang UPT LAB</h2>
+            <h2>Tentang UPT LBK</h2>
 
             <div class="about-grid">
                 <div class="about-content">
-                    <h3>Apa itu UPT LAB?</h3>
-                    <p>UPT LAB adalah platform web terintegrasi untuk manajemen permohonan pengujian yang dirancang untuk memudahkan proses pengajuan, verifikasi, pembayaran, dan pengelolaan hasil pengujian laboratorium.</p>
+                    <h3>Apa itu UPT LBK?</h3>
+                    <p>UPT LBK adalah platform web terintegrasi untuk manajemen permohonan pengujian yang dirancang untuk memudahkan proses pengajuan, verifikasi, pembayaran, dan pengelolaan hasil pengujian laboratorium.</p>
                     <p style="margin-top: 1rem;">Sistem ini menggabungkan teknologi terkini dengan interface yang user-friendly untuk memberikan pengalaman terbaik bagi semua pengguna.</p>
                 </div>
                 <div class="about-image">
@@ -483,7 +483,7 @@
     <section id="laboratories" class="alt">
         <div class="container">
             <h2>Jenis-Jenis Pengujian</h2>
-            <p style="margin-bottom: 3rem; color: #666;">Daftar lengkap jenis pengujian yang tersedia di UPT LAB beserta harga layanan</p>
+            <p style="margin-bottom: 3rem; color: #666;">Daftar lengkap jenis pengujian yang tersedia di UPT LBK beserta harga layanan</p>
 
             <div style="overflow-x: auto; background: white; border-radius: 0.75rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
                 <table style="width: 100%; border-collapse: collapse;">
@@ -568,7 +568,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>UPT Lab.</h4>
+                    <h4>UPT LBK.</h4>
                     <p>Sistem Manajemen Permohonan Pengujian</p>
                 </div>
                 <div class="footer-section">
@@ -582,14 +582,14 @@
                 <div class="footer-section">
                     <h4>Kontak</h4>
                     <ul>
-                        <li><a href="mailto:info@upt2lab.id">info@upt2lab.id</a></li>
-                        <li><a href="tel:+621234567890">+62 123-456-7890</a></li>
-                        <li>Jalan Laboratorium No. 1, Jakarta</li>
+                        <li><a href="mailto:labupt3@gmail.com">labupt3@gmail.com</a></li>
+                        <li><a href="tel:+621234567890">(0536) 3222607</a></li>
+                        <li>Jalan Tjilik Riwut Km. 3 No.14</li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 UPT LAB - Sistem Manajemen Permohonan Pengujian. All rights reserved.</p>
+                <p>&copy; 2026 UPT LBK - Sistem Manajemen Permohonan Pengujian. All rights reserved.</p>
             </div>
         </div>
     </footer>

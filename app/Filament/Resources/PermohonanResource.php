@@ -15,7 +15,6 @@ use Filament\Tables\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Get;
-use Filament\Forms\Set;
 
 class PermohonanResource extends Resource
 {
@@ -124,7 +123,21 @@ class PermohonanResource extends Resource
                         'selesai' => 'Selesai',
                         default => 'Unknown',
                     })
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(
+                        query: fn (Builder $query, string $direction) => 
+                            $query->orderByRaw(
+                                "CASE 
+                                    WHEN status = 'menunggu_verifikasi' THEN 1
+                                    WHEN status = 'perlu_perbaikan' THEN 2
+                                    WHEN status = 'menunggu_pembayaran_sampel' THEN 3
+                                    WHEN status = 'sedang_diuji' THEN 4
+                                    WHEN status = 'menyusun_laporan' THEN 5
+                                    WHEN status = 'selesai' THEN 6
+                                    ELSE 7
+                                END " . ($direction === 'asc' ? 'ASC' : 'DESC')
+                            )
+                    ),
                 Tables\Columns\IconColumn::make('is_paid')
                     ->label('Pembayaran')
                     ->boolean()
