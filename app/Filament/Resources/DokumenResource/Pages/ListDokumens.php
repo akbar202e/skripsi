@@ -10,6 +10,8 @@ class ListDokumens extends ListRecords
 {
     protected static string $resource = DokumenResource::class;
 
+    protected static ?string $title = 'Panduan & Informasi';
+
     protected function getHeaderActions(): array
     {
         return [

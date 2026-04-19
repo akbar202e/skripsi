@@ -8,7 +8,7 @@ use Carbon\Carbon;
 
 class PermohonanDailyChart extends ChartWidget
 {
-    protected static ?string $heading = 'Jumlah Permohonan Per Hari (30 Hari Terakhir)';
+    protected static ?string $heading = 'Jumlah Permohonan';
     protected static ?int $sort = 2;
 
     protected function getData(): array
@@ -34,7 +34,7 @@ class PermohonanDailyChart extends ChartWidget
             $dates[] = now()->subDays($i)->format('d M');
             $counts[] = $data->get($date)?->total ?? 0;
         }
-
+    
         return [
             'datasets' => [
                 [
@@ -63,6 +63,11 @@ class PermohonanDailyChart extends ChartWidget
     {
         return [
             'scales' => [
+                'x' => [
+                    'ticks' => [
+                        'display' => false,
+                    ],
+                ],
                 'y' => [
                     'beginAtZero' => true,
                     'ticks' => [

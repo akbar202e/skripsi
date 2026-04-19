@@ -169,6 +169,8 @@ class ViewPermohonan extends ViewRecord
                             }),
                         Infolists\Components\TextEntry::make('pemohon.name')
                             ->label('Pemohon'),
+                        Infolists\Components\TextEntry::make('pemohon.instansi')
+                            ->label('Instansi'),
                         Infolists\Components\TextEntry::make('worker.name')
                             ->label('Petugas'),
                     ])

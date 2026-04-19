@@ -10,6 +10,8 @@ class ListJenisPengujians extends ListRecords
 {
     protected static string $resource = JenisPengujianResource::class;
 
+    protected static ?string $title = 'Jenis Pengujian';
+    
     protected function getHeaderActions(): array
     {
         return [

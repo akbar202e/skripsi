@@ -15,11 +15,9 @@ use Filament\Tables\Actions\ExportAction;
 class JenisPengujianResource extends Resource
 {
     protected static ?string $model = JenisPengujian::class;
-
+    protected static ?string $navigationLabel = 'Jenis Pengujian';
     protected static ?string $navigationIcon = 'heroicon-o-beaker';
-
     protected static ?string $navigationGroup = 'Master Data';
-
     public static function form(Form $form): Form
     {
         return $form

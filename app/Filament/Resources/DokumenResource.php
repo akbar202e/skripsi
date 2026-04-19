@@ -120,7 +120,7 @@ class DokumenResource extends Resource
                 Tables\Columns\BadgeColumn::make('image_path')
                     ->getStateUsing(fn () => 'IMG')
                     ->color('info')
-                    ->label('Gambar'),
+                    ->label('Tipe'),
                 
                 Tables\Columns\TextColumn::make('creator.name')
                     ->label('Dibuat Oleh')

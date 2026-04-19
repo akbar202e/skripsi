@@ -11,15 +11,11 @@ use Filament\Widgets\TableWidget as BaseWidget;
 class BottleneckDetectionWidget extends BaseWidget
 {
     protected static ?int $sort = 5;
-protected int | string | array $columnSpan = 'full';    
+    protected static ?string $heading = 'Lama Pengerjaan';
+    protected int | string | array $columnSpan = 'full';    
     public static function canView(): bool
     {
         return auth()->check() && (auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Petugas'));
-    }
-
-    public function getHeading(): ?string
-    {
-        return 'Bottleneck Detection - Tahap Tertunda';
     }
 
     public function table(Table $table): Table
@@ -55,7 +51,7 @@ protected int | string | array $columnSpan = 'full';
             })
             ->columns([
                 TextColumn::make('judul')
-                    ->label('Judul Permohonan')
+                    ->label('Judul')
                     ->limit(30),
                 TextColumn::make('status')
                     ->badge()

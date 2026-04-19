@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 class ListPermohonans extends ListRecords
 {
     protected static string $resource = PermohonanResource::class;
-
+    protected static ?string $title = 'Permohonan';
     protected function getHeaderActions(): array
     {
         return [
