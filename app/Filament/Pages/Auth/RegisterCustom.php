@@ -5,6 +5,7 @@ namespace App\Filament\Pages\Auth;
 use Filament\Pages\Auth\Register;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Role;
 
 class RegisterCustom extends Register
@@ -13,6 +14,10 @@ class RegisterCustom extends Register
     {
         $data['password'] = Hash::make($data['password']);
         unset($data['password_confirmation']);
+        
+        // Set is_verified to false - user akan verify email di halaman terpisah
+        $data['is_verified'] = false;
+        
         return $data;
     }
 
@@ -26,7 +31,15 @@ class RegisterCustom extends Register
             $user->assignRole($pemohonRole);
         }
 
+        // Store email in session for verify-email page
+        Session::put('unverified_email', $user->email);
+
         return $user;
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return route('filament.admin.auth.verify-email');
     }
 
     public function form(\Filament\Forms\Form $form): \Filament\Forms\Form
@@ -41,7 +54,8 @@ class RegisterCustom extends Register
                 ->label('Email')
                 ->email()
                 ->required()
-                ->unique($this->getUserModel()),
+                ->unique($this->getUserModel())
+                ->maxLength(255),
 
             TextInput::make('instansi')
                 ->label('Instansi')
