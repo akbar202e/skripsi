@@ -65,10 +65,11 @@ class LoginCustom extends Login
             Session::put('unverified_email', $user->email);
             
             // Redirect to verify-email page
-            return redirect()->route('filament.admin.auth.verify-email');
+            $this->redirect(route('filament.admin.auth.verify-email'));
         }
 
-        return $this->getLoginResponse();
+        // Gunakan parent authenticate untuk return LoginResponse yang benar
+        return parent::authenticate();
     }
 
     protected function throwFailureValidationException(): never

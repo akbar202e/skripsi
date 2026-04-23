@@ -47,9 +47,6 @@ class AdminPanelProvider extends PanelProvider
                 VerifyEmail::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-                Widgets\AccountWidget::class,
-            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -64,6 +61,9 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->middleware([
+                \App\Http\Middleware\CheckEmailVerified::class,
+            ], isPersistent: true)
                 ->plugin(FilamentSpatieRolesPermissionsPlugin::make())
                 ->plugin(FilamentPanzoomPlugin::make());
     }

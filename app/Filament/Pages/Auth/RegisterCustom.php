@@ -4,8 +4,10 @@ namespace App\Filament\Pages\Auth;
 
 use Filament\Pages\Auth\Register;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 
 class RegisterCustom extends Register
@@ -33,6 +35,18 @@ class RegisterCustom extends Register
 
         // Store email in session for verify-email page
         Session::put('unverified_email', $user->email);
+        
+        // PENTING: Logout user jika ada yang terlogin, karena registrasi tidak boleh auto-login
+        if (Auth::check()) {
+            Auth::logout();
+        }
+
+        // Show success notification
+        Notification::make()
+            ->title('Akun berhasil dibuat!')
+            ->body('Silakan verifikasi email Anda untuk melanjutkan.')
+            ->success()
+            ->send();
 
         return $user;
     }
@@ -41,6 +55,7 @@ class RegisterCustom extends Register
     {
         return route('filament.admin.auth.verify-email');
     }
+
 
     public function form(\Filament\Forms\Form $form): \Filament\Forms\Form
     {

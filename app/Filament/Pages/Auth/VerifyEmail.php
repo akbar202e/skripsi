@@ -28,6 +28,7 @@ class VerifyEmail extends Page implements HasForms
     }
 
     public ?string $email = null;
+    public array $data = [];
     public bool $otpSent = false;
     private const RESEND_COOLDOWN = 10; // seconds
 
@@ -41,6 +42,9 @@ class VerifyEmail extends Page implements HasForms
         } else {
             redirect()->route('filament.admin.auth.login')->send();
         }
+
+        // Initialize form data
+        $this->data['email'] = $this->email;
     }
 
     public function form(\Filament\Forms\Form $form): \Filament\Forms\Form
@@ -58,18 +62,7 @@ class VerifyEmail extends Page implements HasForms
                 ->required()
                 ->maxLength(6)
                 ->minLength(6)
-                ->helperText('Masukkan kode 6 digit yang dikirim ke email Anda')
-                ->rule(function ($state) {
-                    return function ($attribute, $value, $fail) {
-                        if (!$this->otpSent) {
-                            $fail('Kirim kode OTP terlebih dahulu');
-                        }
-
-                        if ($value && !OtpService::verifyOtp($this->email, $value)) {
-                            $fail('Kode OTP tidak valid atau telah kedaluwarsa');
-                        }
-                    };
-                }),
+                ->helperText('Masukkan kode 6 digit yang dikirim ke email Anda'),
         ])->statePath('data');
     }
 
@@ -114,12 +107,24 @@ class VerifyEmail extends Page implements HasForms
 
     public function verify(): void
     {
+        // Check if OTP was sent
+        if (!$this->otpSent) {
+            Notification::make()
+                ->title('OTP belum dikirim')
+                ->body('Silakan klik tombol "Kirim OTP" terlebih dahulu')
+                ->warning()
+                ->send();
+            return;
+        }
+
         $data = $this->form->getState();
+        $otp = $data['otp'] ?? null;
 
         // Validate OTP
-        if (!OtpService::verifyOtp($this->email, $data['otp'])) {
+        if (!$otp || !OtpService::verifyOtp($this->email, $otp)) {
             Notification::make()
                 ->title('Kode OTP tidak valid')
+                ->body('Kode OTP tidak valid atau telah kedaluwarsa')
                 ->danger()
                 ->send();
             return;
@@ -136,14 +141,11 @@ class VerifyEmail extends Page implements HasForms
 
         Notification::make()
             ->title('Email berhasil diverifikasi')
+            ->body('Anda dapat melakukan login sekarang')
             ->success()
             ->send();
 
-        // Redirect to login or dashboard
-        if (Auth::check()) {
-            redirect()->route('filament.admin.dashboard');
-        } else {
-            redirect()->route('filament.admin.auth.login');
-        }
+        // Redirect to login
+        $this->redirect(route('filament.admin.auth.login'));
     }
 }

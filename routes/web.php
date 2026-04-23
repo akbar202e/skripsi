@@ -16,6 +16,11 @@ Route::get('/register', function () {
     return redirect('/admin/register');
 })->name('register');
 
+// Verify email route (tidak perlu auth karena user belum fully login)
+Route::get('/admin/verify-email', \App\Filament\Pages\Auth\VerifyEmail::class)
+    ->name('filament.admin.auth.verify-email')
+    ->middleware('web');
+
 Route::middleware('auth')->group(function () {
     Route::get('/dokumen', [DokumenController::class, 'index'])->name('dokumen.index');
     Route::get('/dokumen/{dokumen}', [DokumenController::class, 'show'])->name('dokumen.show');
