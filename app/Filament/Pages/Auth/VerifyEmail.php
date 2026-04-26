@@ -26,7 +26,10 @@ class VerifyEmail extends Page implements HasForms
     {
         return 'verify-email';
     }
-
+    public function getTitle(): string
+    {
+        return 'Verifikasi Email';
+    }
     public ?string $email = null;
     public array $data = [];
     public bool $otpSent = false;

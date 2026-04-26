@@ -9,6 +9,20 @@ class PermohonanObserver
     public function creating(Permohonan $permohonan): void
     {
         $permohonan->user_id = auth()->id();
+        
+        // Kita tidak men-generate sample_code di sini karena $permohonan->id masih null
+    }
+
+public function created(Permohonan $permohonan): void
+    {
+        $today = now()->format('dmy');
+        $permohonanId = $permohonan->id;
+
+        // Set value manual ke model
+        $permohonan->sample_code = "SPL-{$today}-{$permohonanId}";
+        
+        // Simpan tanpa memicu event 'updating' atau 'updated'
+        $permohonan->saveQuietly();
     }
     public function updating(Permohonan $permohonan): void
     {
@@ -24,20 +38,20 @@ class PermohonanObserver
                 'selesai' => $permohonan->completed_at = $now,
                 default => null,
             };
+        }
 
-            // Also set sample_received_at when is_sample_ready is set to true
-            if ($permohonan->isDirty('is_sample_ready') && $permohonan->is_sample_ready) {
-                $permohonan->sample_received_at = $now;
-            }
+        // Juga set sample_received_at ketika is_sample_ready diubah menjadi true
+        if ($permohonan->isDirty('is_sample_ready') && $permohonan->is_sample_ready) {
+            $permohonan->sample_received_at = now();
         }
     }
     /**
      * Handle the Permohonan "created" event.
      */
-    public function created(Permohonan $permohonan): void
-    {
-        //
-    }
+    // public function created(Permohonan $permohonan): void
+    // {
+    //     //
+    // }
 
     /**
      * Handle the Permohonan "updated" event.

@@ -1,11 +1,6 @@
 <x-filament-panels::page>
     <div class="mx-auto max-w-sm space-y-6">
-        <div class="text-center">
-            <h1 class="text-2xl font-bold">{{ __('Verifikasi Email') }}</h1>
-            <p class="mt-2 text-gray-600">
-                Silakan masukkan kode OTP yang telah dikirim ke email Anda
-            </p>
-        </div>
+
 
         <form wire:submit="verify" class="space-y-6">
             {{ $this->form }}

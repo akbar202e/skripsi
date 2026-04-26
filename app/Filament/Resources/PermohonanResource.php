@@ -28,6 +28,10 @@ class PermohonanResource extends Resource
             ->schema([
                 Forms\Components\Section::make('Informasi Permohonan')
                     ->schema([
+                        Forms\Components\TextInput::make('sample_code')
+                            ->label('Kode Sampel')
+                            ->readOnly()
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('judul')
                             ->required()
                             ->maxLength(100)
@@ -66,6 +70,15 @@ class PermohonanResource extends Resource
                         Forms\Components\Checkbox::make('is_sample_ready')
                             ->label('Sampel Sudah Diterima')
                             ->helperText('Centang ketika sampel sudah diterima dari pemohon')
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make('bukti_penerimaan_sampel')
+                            ->label('Bukti Penerimaan Sampel')
+                            ->helperText('Upload foto atau PDF sebagai bukti penerimaan sampel')
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                            ->directory('bukti_sampel')
+                            ->disk('public')
+                            ->downloadable()
+                            ->openable()
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
@@ -138,6 +151,13 @@ class PermohonanResource extends Resource
                                 END " . ($direction === 'asc' ? 'ASC' : 'DESC')
                             )
                     ),
+                Tables\Columns\TextColumn::make('keterangan')
+                    ->label('Keterangan')
+                    ->badge()
+                    ->color('danger')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->visible(fn () => true),
                 Tables\Columns\IconColumn::make('is_paid')
                     ->label('Pembayaran')
                     ->boolean()
@@ -220,6 +240,36 @@ class PermohonanResource extends Resource
                                 'worker_id' => auth()->id()
                             ]);
                         }),
+                    Tables\Actions\Action::make('konfirmasi_sampel_diterima')
+                        ->label('Konfirmasi Sampel Diterima')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->visible(fn (Permohonan $record) => 
+                            $record->status === 'menunggu_pembayaran_sampel' && 
+                            auth()->user()->hasRole('Petugas') &&
+                            $record->worker_id === auth()->id() &&
+                            $record->is_paid &&
+                            !$record->is_sample_ready)
+                        ->form([
+                            Forms\Components\Checkbox::make('is_sample_ready')
+                                ->label('Sampel Sudah Diterima')
+                                ->default(true)
+                                ->disabled()
+                                ->columnSpanFull(),
+                            Forms\Components\FileUpload::make('bukti_penerimaan_sampel')
+                                ->label('Bukti Penerimaan Sampel')
+                                ->helperText('Upload foto atau PDF sebagai bukti penerimaan sampel')
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                                ->directory('bukti_sampel')
+                                ->disk('public')
+                                ->columnSpanFull(),
+                        ])
+                        ->action(function (Permohonan $record, array $data) {
+                            $record->update([
+                                'is_sample_ready' => true,
+                                'bukti_penerimaan_sampel' => $data['bukti_penerimaan_sampel'] ?? $record->bukti_penerimaan_sampel,
+                            ]);
+                        }),
                     Tables\Actions\Action::make('mulai_pengujian')
                         ->label('Mulai Pengujian')
                         ->icon('heroicon-o-beaker')
@@ -267,6 +317,33 @@ class PermohonanResource extends Resource
                             $record->update([
                                 'status' => 'selesai',
                                 'laporan_hasil' => $data['laporan_hasil']
+                            ]);
+                        }),
+                    Tables\Actions\Action::make('sampel_tidak_lengkap')
+                        ->label('Sampel Tidak Lengkap')
+                        ->icon('heroicon-o-exclamation-circle')
+                        ->color('danger')
+                        ->visible(fn (Permohonan $record) => 
+                            $record->status === 'menunggu_pembayaran_sampel' && 
+                            auth()->user()->hasRole('Petugas') &&
+                            $record->worker_id === auth()->id() &&
+                            !$record->is_sample_ready)
+                        ->form([
+                            Forms\Components\Textarea::make('keterangan')
+                                ->label('Keterangan Sampel Tidak Lengkap')
+                                ->required()
+                                ->helperText('Jelaskan apa yang kurang dari sampel'),
+                            Forms\Components\FileUpload::make('bukti_penerimaan_sampel')
+                                ->label('Bukti Penerimaan Sampel')
+                                ->helperText('Upload foto atau PDF sebagai bukti')
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                                ->directory('bukti_sampel')
+                                ->disk('public'),
+                        ])
+                        ->action(function (Permohonan $record, array $data) {
+                            $record->update([
+                                'keterangan' => $data['keterangan'],
+                                'bukti_penerimaan_sampel' => $data['bukti_penerimaan_sampel'] ?? $record->bukti_penerimaan_sampel,
                             ]);
                         }),
                 ])
