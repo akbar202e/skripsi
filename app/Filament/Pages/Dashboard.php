@@ -3,7 +3,9 @@
 namespace App\Filament\Pages;
 
 use Filament\Pages\Dashboard as BaseDashboard;
-
+use App\Filament\Widgets\PermohonanStatsOverview;
+use App\Filament\Widgets\PermohonanChart;
+use App\Filament\Widgets\PermohonanDailyChart;
 
 class Dashboard extends BaseDashboard
 {
@@ -17,10 +19,17 @@ class Dashboard extends BaseDashboard
         return 'Dashboard';
     }
 
-    public function getSubHeading(): ?string
-    {
-        return 'Selamat datang di UPT LAB - Sistem Manajemen Permohonan Pengujian';
-    }
+    // public function getColumns(): int | string | array
+    // {
+    //     return 2;
+    // }
 
-    
+    public function getWidgets(): array
+    {
+        return [
+            PermohonanStatsOverview::class,
+            PermohonanChart::class,
+            PermohonanDailyChart::class,
+        ];
+    }
 }

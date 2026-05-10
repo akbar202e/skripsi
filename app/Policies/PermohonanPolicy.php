@@ -13,6 +13,12 @@ class PermohonanPolicy
      */
     public function viewAny(User $user): bool
     {
+        // Pimpinan dan Admin bisa lihat semua permohonan
+        if ($user->hasRole(['Pimpinan', 'Admin'])) {
+            return true;
+        }
+        
+        // Petugas dan Pemohon juga bisa lihat
         return true;
     }
 
@@ -21,6 +27,21 @@ class PermohonanPolicy
      */
     public function view(User $user, Permohonan $permohonan): bool
     {
+        // Pimpinan dan Admin bisa lihat semua permohonan
+        if ($user->hasRole(['Pimpinan', 'Admin'])) {
+            return true;
+        }
+        
+        // Petugas bisa lihat semua
+        if ($user->hasRole('Petugas')) {
+            return true;
+        }
+        
+        // Pemohon hanya bisa lihat punya sendiri
+        if ($user->hasRole('Pemohon')) {
+            return $permohonan->user_id === $user->id;
+        }
+        
         return true;
     }
 

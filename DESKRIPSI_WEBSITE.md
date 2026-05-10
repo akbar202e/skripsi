@@ -73,7 +73,14 @@ Sistem ini dibuat untuk:
    - Upload hasil pengujian
    - Dokumentasi sampel
 
-### 4. **Admin Sistem**
+### 4. **Pimpinan**
+   - Pimpinan/Manager untuk monitoring keseluruhan sistem
+   - View-only access ke semua permohonan dan pembayaran
+   - Bisa melihat jenis pengujian dan dokumen
+   - Bisa export/download laporan data
+   - Monitoring status semua request tanpa bisa edit
+
+### 5. **Admin Sistem**
    - Mengelola user dan role permissions
    - Mengelola master data (jenis pengujian, metode pembayaran)
    - Monitor sistem keseluruhan
@@ -152,6 +159,7 @@ Sistem ini dibuat untuk:
    
    - **Role-Based Access Control (RBAC)**
      - Admin: Full system access
+     - Pimpinan: View-only access (read + export) ke semua data
      - Petugas: Manage applications & samples
      - Teknisi: Input test results
      - Pemohon: View own applications & payments
