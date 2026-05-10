@@ -6,6 +6,7 @@ use App\Filament\Resources\PermohonanResource;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\HtmlString;
 
 class CreatePermohonan extends CreateRecord
 {
@@ -27,6 +28,7 @@ class CreatePermohonan extends CreateRecord
                             ->columnSpanFull(),
                         Forms\Components\FileUpload::make('surat_permohonan')
                             ->label('Upload Surat Permohonan (PDF)')
+                            ->helperText(new HtmlString('Lihat contoh surat permohonan <a href="http://skripsi.test/admin/dokumens/4" target="_blank" style="color: #cf9604; text-decoration: underline;">disini</a>.'))
                             ->acceptedFileTypes(['application/pdf'])
                             ->directory('permohonan')
                             ->disk('public')

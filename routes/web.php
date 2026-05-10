@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\QrCodeController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -16,9 +17,17 @@ Route::get('/register', function () {
     return redirect('/admin/register');
 })->name('register');
 
+// Verify email route (tidak perlu auth karena user belum fully login)
+Route::get('/admin/verify-email', \App\Filament\Pages\Auth\VerifyEmail::class)
+    ->name('filament.admin.auth.verify-email')
+    ->middleware('web');
+
 Route::middleware('auth')->group(function () {
     Route::get('/dokumen', [DokumenController::class, 'index'])->name('dokumen.index');
     Route::get('/dokumen/{dokumen}', [DokumenController::class, 'show'])->name('dokumen.show');
+
+    // QR Code routes
+    Route::get('/permohonan/{permohonan}/print-qr-code', [QrCodeController::class, 'printQrCode'])->name('permohonan.print-qr-code');
 
     // Payment routes
     Route::prefix('payment')->name('payment.')->group(function () {

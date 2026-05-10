@@ -20,6 +20,12 @@ class ViewPermohonan extends ViewRecord
         $record = $this->record;
         $actions = [
             Actions\EditAction::make(),
+            Actions\Action::make('print_qr_code')
+                ->label('QR Code Sampel')
+                ->icon('heroicon-o-printer')
+                ->color('info')
+                ->url(route('permohonan.print-qr-code', $record))
+                ->openUrlInNewTab(),
         ];
 
         // Tombol Pembayaran untuk user yang mengajukan
@@ -74,17 +80,62 @@ class ViewPermohonan extends ViewRecord
                 $actions[] = Actions\Action::make('konfirmasi_sampel')
                     ->label('Konfirmasi Sampel Diterima')
                     ->icon('heroicon-o-inbox-stack')
-                    ->color('info')
-                    ->requiresConfirmation()
-                    ->modalHeading('Konfirmasi Sampel Diterima')
-                    ->modalDescription('Apakah Anda yakin sampel sudah diterima dari pemohon? Centang "Sampel Sudah Diterima" akan membuka halaman pengujian.')
-                    ->action(function () use ($record) {
-                        $record->update(['is_sample_ready' => true]);
+                    ->color('success')
+                    ->form([
+                        Forms\Components\Checkbox::make('is_sample_ready')
+                            ->label('Sampel Sudah Diterima')
+                            ->default(true)
+                            ->disabled()
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make('bukti_penerimaan_sampel')
+                            ->label('Bukti Penerimaan Sampel')
+                            ->helperText('Upload foto atau PDF sebagai bukti penerimaan sampel')
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                            ->directory('bukti_sampel')
+                            ->disk('public')
+                            ->columnSpanFull(),
+                    ])
+                    ->action(function (array $data) use ($record) {
+                        $record->update([
+                            'is_sample_ready' => true,
+                            'bukti_penerimaan_sampel' => $data['bukti_penerimaan_sampel'] ?? $record->bukti_penerimaan_sampel,
+                        ]);
                         $this->dispatch('refreshPageData');
                         Notification::make()
                             ->success()
                             ->title('Konfirmasi Berhasil')
                             ->body('Sampel telah dikonfirmasi diterima.')
+                            ->send();
+                    });
+
+                $actions[] = Actions\Action::make('sampel_tidak_lengkap')
+                    ->label('Sampel Tidak Lengkap')
+                    ->icon('heroicon-o-exclamation-circle')
+                    ->color('danger')
+                    ->form([
+                        Forms\Components\Textarea::make('keterangan')
+                            ->label('Keterangan Sampel Tidak Lengkap')
+                            ->required()
+                            ->helperText('Jelaskan apa yang kurang dari sampel')
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make('bukti_penerimaan_sampel')
+                            ->label('Bukti Penerimaan Sampel')
+                            ->helperText('Upload foto atau PDF sebagai bukti')
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                            ->directory('bukti_sampel')
+                            ->disk('public')
+                            ->columnSpanFull(),
+                    ])
+                    ->action(function (array $data) use ($record) {
+                        $record->update([
+                            'keterangan' => $data['keterangan'],
+                            'bukti_penerimaan_sampel' => $data['bukti_penerimaan_sampel'] ?? $record->bukti_penerimaan_sampel,
+                        ]);
+                        $this->dispatch('refreshPageData');
+                        Notification::make()
+                            ->success()
+                            ->title('Keterangan Disimpan')
+                            ->body('Sampel ditolak karena tidak lengkap. Pemohon akan menerima notifikasi.')
                             ->send();
                     });
             }
@@ -145,6 +196,8 @@ class ViewPermohonan extends ViewRecord
             ->schema([
                 Infolists\Components\Section::make('Informasi Permohonan')
                     ->schema([
+                        Infolists\Components\TextEntry::make('sample_code')
+                            ->label('Kode Sampel'),
                         Infolists\Components\TextEntry::make('judul'),
                         Infolists\Components\TextEntry::make('isi'),
                         Infolists\Components\TextEntry::make('status')
@@ -201,12 +254,32 @@ class ViewPermohonan extends ViewRecord
                             ->label('Total Biaya Permohonan')
                             ->money('IDR'),
                     ]),
+                Infolists\Components\Section::make('QR Code Sampel')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('sample_code')
+                            ->label('Kode Sampel')
+                            ->copyable()
+                            ->copyableState(fn (string $state): string => $state)
+                            ->columnSpanFull(),
+                        Infolists\Components\ViewEntry::make('qr_code')
+                            ->label('QR Code Label')
+                            ->view('infolists.components.qr-code-display', [
+                                'sampleCode' => $this->record->sample_code,
+                            ])
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
                 Infolists\Components\Section::make('File')
                     ->schema([
                         Infolists\Components\TextEntry::make('surat_permohonan')
                             ->label('Surat Permohonan')
                             ->url(fn ($state) => $state ? url('/storage/' . $state) : null)
                             ->openUrlInNewTab(),
+                        Infolists\Components\TextEntry::make('bukti_penerimaan_sampel')
+                            ->label('Bukti Penerimaan Sampel')
+                            ->url(fn ($state) => $state ? url('/storage/' . $state) : null)
+                            ->openUrlInNewTab()
+                            ->visible(fn () => $this->record->bukti_penerimaan_sampel !== null),
                         Infolists\Components\TextEntry::make('laporan_hasil')
                             ->label('Laporan Hasil')
                             ->url(fn ($state) => $state ? url('/storage/' . $state) : null)
@@ -216,7 +289,9 @@ class ViewPermohonan extends ViewRecord
                 Infolists\Components\Section::make('Keterangan')
                     ->schema([
                         Infolists\Components\TextEntry::make('keterangan')
-                            ->label('Keterangan Perbaikan')
+                            ->label('Keterangan')
+                            ->badge()
+                            ->color('danger')
                             ->visible(fn () => $this->record->keterangan !== null),
                     ]),
             ]);

@@ -13,7 +13,8 @@ class JenisPengujianPolicy
      */
     public function viewAny(User $user): bool
     {
-                return auth()->user()->hasRole('Admin');
+        // Pimpinan, Admin, dan Petugas bisa lihat semua jenis pengujian
+        return $user->hasRole(['Pimpinan', 'Admin', 'Petugas', 'Pemohon']);
     }
 
     /**
@@ -21,7 +22,8 @@ class JenisPengujianPolicy
      */
     public function view(User $user, JenisPengujian $jenisPengujian): bool
     {
-                return auth()->user()->hasRole('Admin');
+        // Pimpinan, Admin, Petugas, dan Pemohon bisa lihat jenis pengujian
+        return $user->hasRole(['Pimpinan', 'Admin', 'Petugas', 'Pemohon']);
     }
 
     /**

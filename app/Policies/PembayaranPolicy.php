@@ -12,7 +12,17 @@ class PembayaranPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['Admin', 'Petugas', 'Pemohon']);
+        // Pimpinan, Admin, Petugas bisa lihat semua pembayaran
+        if ($user->hasRole(['Pimpinan', 'Admin', 'Petugas'])) {
+            return true;
+        }
+        
+        // Pemohon juga bisa melihat daftar pembayaran
+        if ($user->hasRole('Pemohon')) {
+            return true;
+        }
+        
+        return false;
     }
 
     /**
@@ -20,8 +30,8 @@ class PembayaranPolicy
      */
     public function view(User $user, Pembayaran $pembayaran): bool
     {
-        // Admin dan Petugas bisa lihat semua
-        if ($user->hasRole(['Admin', 'Petugas'])) {
+        // Pimpinan dan Admin bisa lihat semua pembayaran
+        if ($user->hasRole(['Pimpinan', 'Admin', 'Petugas'])) {
             return true;
         }
         

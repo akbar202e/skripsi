@@ -3,8 +3,9 @@
 namespace App\Filament\Pages;
 
 use Filament\Pages\Dashboard as BaseDashboard;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
+use App\Filament\Widgets\PermohonanStatsOverview;
+use App\Filament\Widgets\PermohonanChart;
+use App\Filament\Widgets\PermohonanDailyChart;
 
 class Dashboard extends BaseDashboard
 {
@@ -18,28 +19,17 @@ class Dashboard extends BaseDashboard
         return 'Dashboard';
     }
 
-    public function getSubHeading(): ?string
-    {
-        return 'Selamat datang di UPT LAB - Sistem Manajemen Permohonan Pengujian';
-    }
+    // public function getColumns(): int | string | array
+    // {
+    //     return 2;
+    // }
 
-    /**
-     * @return array<class-string<\Filament\Widgets\Widget>|string>
-     */
-    protected function getHeaderWidgets(): array
+    public function getWidgets(): array
     {
         return [
-            AccountWidget::class,
-        ];
-    }
-
-    /**
-     * @return array<class-string<\Filament\Widgets\Widget>|string>
-     */
-    protected function getFooterWidgets(): array
-    {
-        return [
-            FilamentInfoWidget::class,
+            PermohonanStatsOverview::class,
+            PermohonanChart::class,
+            PermohonanDailyChart::class,
         ];
     }
 }

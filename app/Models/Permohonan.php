@@ -32,7 +32,9 @@ class Permohonan extends Model
         'testing_started_at',
         'testing_ended_at',
         'report_started_at',
-        'completed_at'
+        'completed_at',
+        'sample_code',
+        'bukti_penerimaan_sampel'
     ];
 
     protected $casts = [
