@@ -1,0 +1,11 @@
+--- a/vendor/althinect/filament-spatie-roles-permissions/src/Resources/RoleResource.php
++++ b/vendor/althinect/filament-spatie-roles-permissions/src/Resources/RoleResource.php
+@@ -53,7 +53,7 @@ class RoleResource extends Resource
+         return __('filament-spatie-roles-permissions::filament-spatie.section.role');
+     }
+ 
+-    public static function getNavigationGroup(): UnitEnum|string|null
++    public static function getNavigationGroup(): ?string
+     {
+         $navigationGroup = config('filament-spatie-roles-permissions.navigation_section_group', 'filament-spatie-roles-permissions::filament-spatie.section.roles_and_permissions');
+ 
